@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Callback</string>
+    <string name="about">About</string>
+    <string name="start_on_speaker">Start call on speaker phone</string>
+    <string name="update_trigger_phrase">Update Trigger Phrase</string>
+    <string name="trigger_updated">Trigger phrase updated!</string>
+    <string name="no_phrase_set">No phrase set</string>
+    <string name="current_trigger_phrase">Current trigger phrase</string>
+    <string name="start_callback_service">Start Callback Service</string>
+    <string name="stop_callback_service">Start Callback Service</string>
+    <string name="callback_enabled">"Callback service enabled"</string>
+    <string name="callback_disabled">"Callback service disabled"</string>
+    <string name="disable_callback">"Disable Callback service"</string>
+    <string name="enable_callback">"Enable Callback service"</string>
+    <string name="error_trigger_min_length">"Trigger phrase must be at least 4 chars"</string>
+</resources>
