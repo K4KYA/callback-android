@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference
+        android:summary="@string/version"
+        android:title="Version" />
+    <Preference android:title="Rate in Play Store">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="http://www.spoonly.me" />
+    </Preference>
+    <Preference
+        android:key="@string/send_feedback"
+        android:title="@string/send_feedback" />
+    <Preference android:title="Open source licenses" />
+    <Preference
+        android:key="@string/intro"
+        android:title="Show intro" />
+</PreferenceScreen>

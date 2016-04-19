@@ -2,6 +2,7 @@ package com.k4kya.callback
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -25,42 +26,46 @@ class MainActivity : AppCompatActivity() {
             RequestedPermissions(Manifest.permission.RECEIVE_SMS, requestingSmsPermission)
     )
 
-    private val toolbar: Toolbar?
+    val toolbar: Toolbar?
         get() {
-            val toolbar = findViewById(R.id.toolbar) as Toolbar?
-            return toolbar
+            return findViewById(R.id.toolbar) as Toolbar?
         }
 
-    private val btnToggle: Button?
+    val btnToggle: Button?
         get() {
-            val btnToggle = findViewById(R.id.btnToggleService) as Button?
-            return btnToggle
+            return findViewById(R.id.btnToggleService) as Button?
         }
 
-    private val editTriggerPhrase: EditText?
+    val editTriggerPhrase: EditText?
         get() {
-            val editTriggerPhrase = findViewById(R.id.editTriggerPhrase) as EditText?
-            return editTriggerPhrase
+            return findViewById(R.id.editTriggerPhrase) as EditText?
         }
 
-    private val btnSetTriggerPhrase: Button?
+    val btnSetTriggerPhrase: Button?
         get() {
-            val btnSetTriggerPhrase = findViewById(R.id.btnSetTriggerPhrase) as Button?
-            return btnSetTriggerPhrase
+            return findViewById(R.id.btnSetTriggerPhrase) as Button?
         }
 
-    private val checkUseSpeaker: CheckBox?
+    val checkUseSpeaker: CheckBox?
         get() {
-            val checkUseSpeaker = findViewById(R.id.checkUseSpeaker) as CheckBox?
-            return checkUseSpeaker
+            return findViewById(R.id.checkUseSpeaker) as CheckBox?
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        showOnboardingIfNecessary();
         checkPermissions()
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
         setupUI()
+    }
+
+    fun showOnboardingIfNecessary() {
+        val shown = getSharedPrefs(this)?.getBoolean(getString(R.string.intro_shown), false) ?: false
+        if (!shown) {
+            startActivity(Intent(this, OnboardingActivity::class.java))
+            getSharedPrefs(this)?.edit()?.putBoolean(getString(R.string.intro_shown), true)?.apply()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -69,11 +74,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return super.onOptionsItemSelected(item)
+        if (item != null) {
+            when (item.itemId) {
+                R.id.menu_about -> {
+                    startAboutActivity(); return true
+                }
+                else -> return false
+            }
+        }
+        return false
+    }
+
+    private fun startAboutActivity() {
+        val aboutIntent = Intent(this, AboutActivity::class.java)
+        startActivity(aboutIntent)
     }
 
     private fun checkPermissions() {
-        var permissionsRequestedFlags = 0;
+        var permissionsRequestedFlags = 0
         var permissionsToRequest = emptyList<String>()
 
         requiredPermissions.map {
@@ -89,7 +107,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun hasPermission(permission: String): Boolean {
-        var status = ContextCompat.checkSelfPermission(this, permission);
+        var status = ContextCompat.checkSelfPermission(this, permission)
         return (status == PackageManager.PERMISSION_GRANTED)
     }
 

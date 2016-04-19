@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -11,21 +11,20 @@
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        app:elevation="0dp">
+        android:fitsSystemWindows="true">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:fitsSystemWindows="true"
-            app:title="Callback"
-            app:titleTextColor="@color/white" />
+            app:title="Callback" />
     </android.support.design.widget.AppBarLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/appbar"
         android:orientation="vertical"
         android:padding="16dp">
 
@@ -33,6 +32,7 @@
             android:id="@+id/btnToggleService"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/red_button"
             android:text="@string/start_callback_service" />
 
         <TextView
@@ -53,6 +53,7 @@
             android:id="@+id/btnSetTriggerPhrase"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/main_button"
             android:text="@string/update_trigger_phrase" />
 
         <CheckBox
@@ -62,4 +63,4 @@
             android:padding="16dp"
             android:text="@string/start_on_speaker" />
     </LinearLayout>
-</LinearLayout>
+</RelativeLayout>
