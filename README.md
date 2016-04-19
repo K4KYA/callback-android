@@ -15,3 +15,4 @@ A few scenarios where this might be useful:
 ##How?
 
 Callback is written fully in [Kotlin](https://kotlinlang.org/) and I intend for it to remain that way.
+Callback currently supports Android API 19+ and targets API 23, with support for runtime permissions.
