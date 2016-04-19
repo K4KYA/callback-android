@@ -18,12 +18,9 @@ import android.widget.EditText
 import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
-
-    val requestingSmsPermission = 1.shl(0)
-    val requestingPhonePermission = 1.shl(1)
     val requiredPermissions = listOf(
-            RequestedPermissions(Manifest.permission.CALL_PHONE, requestingPhonePermission),
-            RequestedPermissions(Manifest.permission.RECEIVE_SMS, requestingSmsPermission)
+            Manifest.permission.CALL_PHONE,
+            Manifest.permission.RECEIVE_SMS
     )
 
     val toolbar: Toolbar?
@@ -91,13 +88,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkPermissions() {
-        var permissionsRequestedFlags = 0
+        var permissionsRequestedFlags = 2
         var permissionsToRequest = emptyList<String>()
 
         requiredPermissions.map {
-            if (!hasPermission(it.name)) {
-                permissionsToRequest = permissionsToRequest.plus(it.name)
-                permissionsRequestedFlags.or(it.code)
+            if (!hasPermission(it)) {
+                permissionsToRequest = permissionsToRequest.plus(it)
             }
         }
 
@@ -207,6 +203,4 @@ class MainActivity : AppCompatActivity() {
     private fun showMessage(resId: Int) {
         Toast.makeText(this, resId, Toast.LENGTH_LONG).show()
     }
-
-    data class RequestedPermissions(val name: String, val code: Int)
 }
