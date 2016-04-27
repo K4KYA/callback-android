@@ -30,6 +30,8 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.3.0'
     compile 'com.android.support:design:23.3.0'
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile 'org.jetbrains.anko:anko-sdk19:0.8.3'
+    compile 'org.jetbrains.anko:anko-appcompat-v7:0.8.3'
 }
 buildscript {
     ext.kotlin_version = '1.0.1-2'

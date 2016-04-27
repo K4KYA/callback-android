@@ -2,7 +2,6 @@ package com.k4kya.callback
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -16,6 +15,7 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Toast
+import org.jetbrains.anko.startActivity
 
 class MainActivity : AppCompatActivity() {
     val requiredPermissions = listOf(
@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
             Manifest.permission.RECEIVE_SMS
     )
 
-    val toolbar: Toolbar?
+    val actionbar: Toolbar?
         get() {
             return findViewById(R.id.toolbar) as Toolbar?
         }
@@ -53,14 +53,14 @@ class MainActivity : AppCompatActivity() {
         showOnboardingIfNecessary();
         checkPermissions()
         setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
+        setSupportActionBar(actionbar)
         setupUI()
     }
 
     fun showOnboardingIfNecessary() {
         val shown = getSharedPrefs(this)?.getBoolean(getString(R.string.intro_shown), false) ?: false
         if (!shown) {
-            startActivity(Intent(this, OnboardingActivity::class.java))
+            startActivity<OnboardingActivity>()
             getSharedPrefs(this)?.edit()?.putBoolean(getString(R.string.intro_shown), true)?.apply()
         }
     }
@@ -83,15 +83,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startAboutActivity() {
-        val aboutIntent = Intent(this, AboutActivity::class.java)
-        startActivity(aboutIntent)
+        startActivity<AboutActivity>()
     }
 
     private fun checkPermissions() {
         var permissionsRequestedFlags = 2
         var permissionsToRequest = emptyList<String>()
 
-        requiredPermissions.map {
+        requiredPermissions.forEach {
             if (!hasPermission(it)) {
                 permissionsToRequest = permissionsToRequest.plus(it)
             }
@@ -191,7 +190,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        permissions.map {
+        permissions.forEach {
             val index = permissions.indexOf(it)
             val granted = grantResults[index]
             if (granted != PackageManager.PERMISSION_GRANTED) {

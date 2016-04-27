@@ -1,11 +1,10 @@
 package com.k4kya.callback
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.preference.Preference
 import android.preference.PreferenceFragment
-import android.util.Log
+import org.jetbrains.anko.email
 
 class SettingsFragment : PreferenceFragment() {
 
@@ -24,11 +23,7 @@ class SettingsFragment : PreferenceFragment() {
         addPreferencesFromResource(R.xml.preferences)
         sendFeedback.setOnPreferenceClickListener(
                 { preference ->
-                    val sendFeedbackIntent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:amal.kakaiya@gmail.com"))
-                    sendFeedbackIntent.extras?.putString(Intent.EXTRA_SUBJECT, "Callback v" + getString(R.string.version))
-                    startActivity(Intent.createChooser(sendFeedbackIntent, "Send email..."))
-                    Log.d("SettingsFragment", "send Feedback clicked")
-                    true
+                    email("amal.kakaiya@gmail.com", "Callback v" + getString(R.string.version))
                 })
         showIntro.setOnPreferenceClickListener { preference -> startActivity(Intent(activity, OnboardingActivity::class.java)); true }
     }
