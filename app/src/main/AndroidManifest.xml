@@ -19,6 +19,7 @@
         </activity>
         <activity android:name=".AboutActivity" />
         <activity android:name=".OnboardingActivity" />
+        <activity android:name=".WebViewActivity" />
 
         <receiver
             android:name=".SmsListener"

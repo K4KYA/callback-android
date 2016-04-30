@@ -1,0 +1,27 @@
+body {
+    padding : 16px;
+    font-family: sans-serif;
+}
+
+ul {
+  list-style-type: none;
+  margin-left: -16px;
+
+}
+
+ul li {
+  margin-top: 16px;
+}
+
+.projectTitle {
+  font-weight: bold;
+}
+
+.copyright {
+  font-weight: lighter;
+  font-size: 0.8rem;
+}
+
+pre {
+  padding : 16px;
+}
