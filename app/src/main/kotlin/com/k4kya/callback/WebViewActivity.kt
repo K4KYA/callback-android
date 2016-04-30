@@ -42,7 +42,7 @@ class WebViewActivity : AppCompatActivity() {
     private fun setupToolbar(target: String) {
         if (toolbar != null) {
             setSupportActionBar(toolbar)
-            toolbar?.title = target
+            supportActionBar?.title = target
             supportActionBar?.setHomeButtonEnabled(true)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
         }
