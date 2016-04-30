@@ -15,6 +15,7 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Toast
+import org.jetbrains.anko.findOptional
 import org.jetbrains.anko.startActivity
 
 class MainActivity : AppCompatActivity() {
@@ -24,29 +25,19 @@ class MainActivity : AppCompatActivity() {
     )
 
     val actionbar: Toolbar?
-        get() {
-            return findViewById(R.id.toolbar) as Toolbar?
-        }
+        get() = findOptional(R.id.toolbar)
 
     val btnToggle: Button?
-        get() {
-            return findViewById(R.id.btnToggleService) as Button?
-        }
+        get() = findOptional(R.id.btnToggleService)
 
     val editTriggerPhrase: EditText?
-        get() {
-            return findViewById(R.id.editTriggerPhrase) as EditText?
-        }
+        get() = findOptional(R.id.editTriggerPhrase)
 
     val btnSetTriggerPhrase: Button?
-        get() {
-            return findViewById(R.id.btnSetTriggerPhrase) as Button?
-        }
+        get() = findOptional(R.id.btnSetTriggerPhrase)
 
     val checkUseSpeaker: CheckBox?
-        get() {
-            return findViewById(R.id.checkUseSpeaker) as CheckBox?
-        }
+        get() = findOptional(R.id.checkUseSpeaker)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,7 +117,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupTriggerPhraseButton() {
-        btnSetTriggerPhrase?.setOnClickListener { setTriggerPhrase() }
+        btnSetTriggerPhrase?.setOnClickListener {
+            if (setTriggerPhrase())
+                showMessage(R.string.trigger_updated)
+            else
+                showMessage(R.string.trigger_not_updated)
+        }
     }
 
     private fun setupTriggerPhraseInput() {
@@ -143,8 +139,8 @@ class MainActivity : AppCompatActivity() {
         btnToggle?.text = getString(if (serviceEnabled) R.string.disable_callback else R.string.enable_callback)
     }
 
-    private fun setTriggerPhrase() {
-        val triggerPhrase = editTriggerPhrase?.text?.toString() ?: return
+    private fun setTriggerPhrase(): Boolean {
+        val triggerPhrase = editTriggerPhrase?.text?.toString() ?: return false
         if (triggerPhrase.length < 4) {
             Toast.makeText(this, R.string.error_trigger_min_length, Toast.LENGTH_LONG).show()
         }
@@ -152,8 +148,8 @@ class MainActivity : AppCompatActivity() {
                 ?.edit()
                 ?.putString(SmsListener.Constants.CALLBACK_SERVICE_TRIGGER_PHRASE, triggerPhrase)
                 ?.apply()
-                ?: return
-        showMessage(R.string.trigger_updated)
+                ?: return false
+        return true
     }
 
     private fun getTriggerPhrase(): String? {

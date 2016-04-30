@@ -3,15 +3,17 @@
     <Preference
         android:summary="@string/version"
         android:title="Version" />
-    <Preference android:title="Rate in Play Store">
+    <Preference android:title="@string/rate">
         <intent
             android:action="android.intent.action.VIEW"
-            android:data="http://www.spoonly.me" />
+            android:data="market://details?id=com.k4kya.callback" />
     </Preference>
     <Preference
         android:key="@string/send_feedback"
         android:title="@string/send_feedback" />
-    <Preference android:title="Open source licenses" />
+    <Preference
+        android:key="@string/open_source"
+        android:title="@string/open_source" />
     <Preference
         android:key="@string/intro"
         android:title="Show intro" />

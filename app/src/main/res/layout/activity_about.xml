@@ -41,8 +41,10 @@
         android:padding="16dp">
 
         <TextView
+            android:id="@+id/shamelessSelfPromo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:clickable="true"
             android:text="@string/shameless_self_promotion" />
     </RelativeLayout>
 </RelativeLayout>
