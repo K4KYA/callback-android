@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
@@ -14,7 +15,7 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
-import android.widget.Toast
+import org.jetbrains.anko.find
 import org.jetbrains.anko.findOptional
 import org.jetbrains.anko.startActivity
 
@@ -23,6 +24,8 @@ class MainActivity : AppCompatActivity() {
             Manifest.permission.CALL_PHONE,
             Manifest.permission.RECEIVE_SMS
     )
+
+    val TRIGGER_PHRASE_MIN_LENGTH = 4
 
     val actionbar: Toolbar?
         get() = findOptional(R.id.toolbar)
@@ -100,7 +103,7 @@ class MainActivity : AppCompatActivity() {
     private fun setupUI() {
         setupServiceToggleButton()
         setupTriggerPhraseInput()
-        setupTriggerPhraseButton()
+        setupTriggerPhraseUpdateButton()
         setupUseSpeaker()
         updateServiceStatusText()
     }
@@ -116,17 +119,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupTriggerPhraseButton() {
+    private fun setupTriggerPhraseUpdateButton() {
         btnSetTriggerPhrase?.setOnClickListener {
-            if (setTriggerPhrase())
-                showMessage(R.string.trigger_updated)
-            else
-                showMessage(R.string.trigger_not_updated)
+            updateTriggerPhrase()
         }
     }
 
     private fun setupTriggerPhraseInput() {
-        editTriggerPhrase?.setText(getTriggerPhrase() ?: "")
+        editTriggerPhrase?.setText(loadTriggerPhrase() ?: "")
     }
 
     private fun setupServiceToggleButton() {
@@ -139,46 +139,53 @@ class MainActivity : AppCompatActivity() {
         btnToggle?.text = getString(if (serviceEnabled) R.string.disable_callback else R.string.enable_callback)
     }
 
-    private fun setTriggerPhrase(): Boolean {
-        val triggerPhrase = editTriggerPhrase?.text?.toString() ?: return false
-        if (triggerPhrase.length < 4) {
-            Toast.makeText(this, R.string.error_trigger_min_length, Toast.LENGTH_LONG).show()
-        }
+    private fun saveTriggerPhrase(triggerPhrase: String): () -> Boolean {
         getSharedPrefs(this)
                 ?.edit()
                 ?.putString(SmsListener.Constants.CALLBACK_SERVICE_TRIGGER_PHRASE, triggerPhrase)
                 ?.apply()
-                ?: return false
-        return true
+                ?: return { showMessage(R.string.trigger_not_updated); false }
+        return { showMessage(R.string.trigger_updated); true }
     }
 
     private fun getTriggerPhrase(): String? {
-        return getSharedPrefs(this)?.getString(SmsListener.Constants.CALLBACK_SERVICE_TRIGGER_PHRASE, "")
+        val existingTrigger = loadTriggerPhrase()
+        val currentOnScreenTrigger = editTriggerPhrase?.text?.toString()
+        return (if (existingTrigger != currentOnScreenTrigger) currentOnScreenTrigger else existingTrigger)
     }
+
+    private fun loadTriggerPhrase(): String? = getSharedPrefs(this)?.getString(SmsListener.Constants.CALLBACK_SERVICE_TRIGGER_PHRASE, "")
 
     private fun getCallbackServiceEnabledStatus(): Boolean {
         return getSharedPrefs(this)?.getBoolean(SmsListener.Constants.CALLBACK_SERVICE_ENABLED_FLAG, false) ?: false
     }
 
-    private fun validateTriggerPhrase(): Boolean {
-        val triggerPhrase = getTriggerPhrase()
-        if (triggerPhrase != null) {
-            if (triggerPhrase.length >= 4) {
-                return true
-            }
+    private fun validateTriggerPhraseLength(triggerPhrase: String): Boolean {
+        if (triggerPhrase.length >= TRIGGER_PHRASE_MIN_LENGTH) {
+            return true
         }
-        showMessage(R.string.error_trigger_min_length)
         return false
     }
 
     private fun setCallbackServiceEnabled(enabled: Boolean) {
-        if (!validateTriggerPhrase()) {
-            return
+        if (updateTriggerPhrase()) {
+            val sharedPrefsEditor = getSharedPrefs(this)?.edit() ?: return
+            sharedPrefsEditor.putBoolean(SmsListener.Constants.CALLBACK_SERVICE_ENABLED_FLAG, enabled).apply()
+            updateServiceStatusText()
+            showMessage(if (enabled) R.string.callback_enabled else R.string.callback_disabled)
         }
-        val sharedPrefsEditor = getSharedPrefs(this)?.edit() ?: return
-        sharedPrefsEditor.putBoolean(SmsListener.Constants.CALLBACK_SERVICE_ENABLED_FLAG, enabled).apply()
-        updateServiceStatusText()
-        showMessage(if (enabled) R.string.callback_enabled else R.string.callback_disabled)
+    }
+
+    private fun updateTriggerPhrase(): Boolean {
+        val triggerPhrase = getTriggerPhrase()
+        if (triggerPhrase != null) {
+            if (!validateTriggerPhraseLength(triggerPhrase)) {
+                showMessage(R.string.error_trigger_min_length)
+                return false
+            }
+            return saveTriggerPhrase(triggerPhrase)()
+        }
+        return false
     }
 
     private fun getSharedPrefs(context: Context?): SharedPreferences? {
@@ -196,6 +203,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showMessage(resId: Int) {
-        Toast.makeText(this, resId, Toast.LENGTH_LONG).show()
+        Snackbar.make(find(android.R.id.content), resId, Snackbar.LENGTH_LONG).show()
     }
 }
