@@ -11,10 +11,10 @@ import android.telephony.TelephonyManager
 
 class SmsListener : BroadcastReceiver() {
 
-    object Constants {
+    companion object {
         const val CALLBACK_SERVICE_ENABLED_FLAG = "callbackServiceEnabled"
         const val CALLBACK_SERVICE_TRIGGER_PHRASE = "callbackTrigger"
-        const val CALLBACK_SHARED_PREFS_KEY = "com.k4kya.callback"
+        const val CALLBACK_SHARED_PREFS_KEY = BuildConfig.APPLICATION_ID
         const val CALLBACK_USE_SPEAKERPHONE = "useSpeakerPhone"
     }
 
@@ -31,7 +31,7 @@ class SmsListener : BroadcastReceiver() {
     }
 
     private fun isCallbackServiceEnabled(context: Context?): Boolean {
-        return getSharedPrefs(context)?.getBoolean(Constants.CALLBACK_SERVICE_ENABLED_FLAG, false) ?: false
+        return getSharedPrefs(context)?.getBoolean(CALLBACK_SERVICE_ENABLED_FLAG, false) ?: false
     }
 
     private fun isTelephonyEnabled(context: Context?): Boolean {
@@ -48,13 +48,13 @@ class SmsListener : BroadcastReceiver() {
     }
 
     private fun useSpeakerPhone(context: Context?): Boolean {
-        return getSharedPrefs(context)?.getBoolean(Constants.CALLBACK_USE_SPEAKERPHONE, false) ?: false
+        return getSharedPrefs(context)?.getBoolean(CALLBACK_USE_SPEAKERPHONE, false) ?: false
     }
 
     private fun callbackNumberFromMessagesForTrigger(messages: List<Message>, triggerPhrase: String): String? {
         var sender: String? = null
-        messages.map {
-            if (it.message?.startsWith(triggerPhrase) ?: false) {
+        messages.forEach {
+            if (isTriggerPhraseInMessage(it.message, triggerPhrase) ?: false) {
                 sender = it.sender
             }
         }
@@ -72,12 +72,14 @@ class SmsListener : BroadcastReceiver() {
         return messages
     }
 
+    fun isTriggerPhraseInMessage(message: String?, triggerPhrase: String) = message?.startsWith(triggerPhrase)
+
     private fun getTriggerPhrase(context: Context?): String? {
-        return getSharedPrefs(context)?.getString(Constants.CALLBACK_SERVICE_TRIGGER_PHRASE, null)
+        return getSharedPrefs(context)?.getString(CALLBACK_SERVICE_TRIGGER_PHRASE, null)
     }
 
     private fun getSharedPrefs(context: Context?): SharedPreferences? {
-        return context?.getSharedPreferences(Constants.CALLBACK_SHARED_PREFS_KEY, Context.MODE_PRIVATE)
+        return context?.getSharedPreferences(CALLBACK_SHARED_PREFS_KEY, Context.MODE_PRIVATE)
     }
 
     data class Message(val sender: String?, val message: String?)
