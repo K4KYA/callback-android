@@ -11,19 +11,19 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import com.k4kya.kotlinrxbindings.widgets.AfterTextChangedEvent
+import com.k4kya.kotlinrxbindings.widgets.textEvents
 import org.jetbrains.anko.find
 import org.jetbrains.anko.findOptional
 import org.jetbrains.anko.startActivity
-import rx.Observable
-import rx.android.MainThreadSubscription
-import java.util.concurrent.TimeUnit
+import rx.Subscription
+import rx.android.schedulers.AndroidSchedulers
 
 class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
 
@@ -58,6 +58,17 @@ class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
         setupUI()
     }
 
+
+    override fun onResume() {
+        super.onResume()
+        setupTextWatcher()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        textWatcher?.unsubscribe()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu, menu)
         return true
@@ -88,7 +99,7 @@ class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
     }
 
     fun checkPermissions() {
-        var permissionsRequestedFlags = 2
+        val permissionsRequestedFlags = 2
         var permissionsToRequest = emptyList<String>()
 
         requiredPermissions.forEach {
@@ -103,7 +114,7 @@ class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
     }
 
     fun hasPermission(permission: String): Boolean {
-        var status = ContextCompat.checkSelfPermission(this, permission)
+        val status = ContextCompat.checkSelfPermission(this, permission)
         return (status == PackageManager.PERMISSION_GRANTED)
     }
 
@@ -111,14 +122,21 @@ class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
         setupServiceToggleButton()
         setupTriggerPhraseUpdateButton()
         setupUseSpeaker()
-        setupTextWatcher()
     }
 
+    private var textWatcher: Subscription? = null
+
     private fun setupTextWatcher() {
-        editTriggerPhrase?.addTextChangedListener()
-                ?.filter { it.eventType == TextWatcherEvent.afterChange }
-                ?.debounce(1, TimeUnit.SECONDS)
-                ?.subscribe { Log.d("TextWatcherSubscriber: ", "" + it.value) }
+        textWatcher = editTriggerPhrase?.textEvents()
+                ?.filter { it is AfterTextChangedEvent }
+                ?.subscribeOn(AndroidSchedulers.mainThread())
+                ?.subscribe {
+                    when (it) {
+                        is AfterTextChangedEvent -> {
+                            Log.d("Callback", "value after is " + it.value)
+                        }
+                    }
+                }
     }
 
     fun setupUseSpeaker() {
@@ -141,6 +159,10 @@ class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
 
     fun getSharedPrefs(context: Context?): SharedPreferences? {
         return context?.getSharedPreferences(SmsListener.CALLBACK_SHARED_PREFS_KEY, Context.MODE_PRIVATE)
+    }
+
+    override fun updateStatusText(enabled: Boolean) {
+        btnToggle?.text = getString(if (enabled) R.string.stop_callback_service else R.string.start_callback_service)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -174,39 +196,4 @@ class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
     }
 
     override fun getLatestTriggerPhrase() = editTriggerPhrase?.text?.toString()
-
-    fun EditText.addTextChangedListener(): Observable<TriggerTextWatcher> {
-        return Observable.create({
-            if (!it.isUnsubscribed) {
-                val watcher: TextWatcher = object : TextWatcher {
-                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                        it.onNext(TriggerTextWatcher(TextWatcherEvent.onChange, s))
-                    }
-
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                        it.onNext(TriggerTextWatcher(TextWatcherEvent.willChange, s))
-                    }
-
-                    override fun afterTextChanged(s: Editable?) {
-                        it.onNext(TriggerTextWatcher(TextWatcherEvent.afterChange, s))
-                    }
-                }
-                addTextChangedListener(watcher)
-                val removeListener = { removeTextChangedListener(watcher) }
-                it.add(object : MainThreadSubscription() {
-                    override fun onUnsubscribe() {
-                        removeListener()
-                    }
-                })
-            }
-        })
-    }
-
-    enum class TextWatcherEvent {
-        onChange,
-        willChange,
-        afterChange
-    }
-
-    data class TriggerTextWatcher(val eventType: TextWatcherEvent, val value: CharSequence?)
 }

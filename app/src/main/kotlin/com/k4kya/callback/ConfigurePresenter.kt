@@ -14,15 +14,19 @@ class ConfigurePresenter(override var callbackService: CallbackService, override
 
     override fun setCallbackEnabled(enabled: Boolean) {
         if (!enabled) {
-            callbackService.setServiceEnabled(!enabled)
+            callbackService.setServiceEnabled(enabled)
+            view.updateStatusText(false)
+            return
         }
         val trigger = view.getLatestTriggerPhrase()
         if (trigger == null || !validateTriggerPhrase(trigger)) {
             callbackService.setServiceEnabled(false)
+            view.updateStatusText(false)
             return
         }
         setTriggerPhrase(trigger)
         callbackService.setServiceEnabled(true)
+        view.updateStatusText(true)
     }
 
     override fun setTriggerPhrase(triggerPhrase: String) {

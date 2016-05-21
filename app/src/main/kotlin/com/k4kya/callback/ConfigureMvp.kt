@@ -11,6 +11,7 @@ interface ConfigureMvp {
         fun setTriggerPhrase(trigger: Editable)
         fun setSpeakerEnabled(enabled: Boolean)
         fun getLatestTriggerPhrase(): String?
+        fun updateStatusText(enabled: Boolean)
     }
 
     interface Presenter {
