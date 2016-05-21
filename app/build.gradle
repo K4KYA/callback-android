@@ -4,7 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "24.0.0 rc2"
+    buildToolsVersion '23.0.2'
 
     defaultConfig {
         applicationId "com.k4kya.callback"
@@ -45,6 +45,8 @@ dependencies {
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2'
     androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.1'
     androidTestCompile 'com.android.support:support-annotations:23.4.0'
+    compile project(path: ':kotlinrxbindings')
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha1'
 }
 buildscript {
     ext.kotlin_version = '1.0.2'
