@@ -36,6 +36,10 @@ class ConfigurePresenterTest {
 
     val mockView = object : ConfigureMvp.View {
 
+        override fun setServiceToggleButtonEnabled(enabled: Boolean) {
+
+        }
+
         var trigger: String? = null
 
         override fun showMessage(resId: Int) {

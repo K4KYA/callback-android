@@ -11,7 +11,6 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.text.Editable
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
@@ -19,6 +18,7 @@ import android.widget.CheckBox
 import android.widget.EditText
 import com.k4kya.kotlinrxbindings.widgets.AfterTextChangedEvent
 import com.k4kya.kotlinrxbindings.widgets.textEvents
+import org.jetbrains.anko.enabled
 import org.jetbrains.anko.find
 import org.jetbrains.anko.findOptional
 import org.jetbrains.anko.startActivity
@@ -133,7 +133,9 @@ class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
                 ?.subscribe {
                     when (it) {
                         is AfterTextChangedEvent -> {
-                            Log.d("Callback", "value after is " + it.value)
+                            if (it.value != null) {
+                                presenter.setTriggerPhrase(it.value.toString())
+                            }
                         }
                     }
                 }
@@ -193,6 +195,10 @@ class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
 
     override fun setSpeakerEnabled(enabled: Boolean) {
         checkUseSpeaker?.isChecked = enabled
+    }
+
+    override fun setServiceToggleButtonEnabled(enabled: Boolean) {
+        btnToggle?.enabled = enabled
     }
 
     override fun getLatestTriggerPhrase() = editTriggerPhrase?.text?.toString()

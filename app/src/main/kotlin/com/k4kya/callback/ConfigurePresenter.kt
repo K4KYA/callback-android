@@ -22,7 +22,13 @@ class ConfigurePresenter(override var callbackService: CallbackService, override
     }
 
     override fun setTriggerPhrase(triggerPhrase: String) {
-        callbackService.setTriggerPhrase(triggerPhrase)
+        if (validateTriggerPhrase(triggerPhrase)) {
+            callbackService.setTriggerPhrase(triggerPhrase)
+            view.setServiceToggleButtonEnabled(true)
+        } else {
+            setCallbackEnabled(false)
+            view.setServiceToggleButtonEnabled(false)
+        }
     }
 
     override fun setStartOnSpeaker(speaker: Boolean) {

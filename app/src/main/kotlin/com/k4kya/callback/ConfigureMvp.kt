@@ -10,6 +10,7 @@ interface ConfigureMvp {
         fun setSpeakerEnabled(enabled: Boolean)
         fun getLatestTriggerPhrase(): String?
         fun updateStatusText(enabled: Boolean)
+        fun setServiceToggleButtonEnabled(enabled: Boolean)
     }
 
     interface Presenter {
