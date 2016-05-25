@@ -187,8 +187,8 @@ class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
         btnToggle?.text = status
     }
 
-    override fun setTriggerPhrase(trigger: Editable) {
-        editTriggerPhrase?.text = trigger
+    override fun setTriggerPhrase(trigger: CharSequence) {
+        editTriggerPhrase?.text = trigger as Editable
     }
 
     override fun setSpeakerEnabled(enabled: Boolean) {

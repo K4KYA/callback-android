@@ -4,14 +4,6 @@ class ConfigurePresenter(override var callbackService: CallbackService, override
 
     val TRIGGER_MIN_LENGTH = 4
 
-    override fun bindView(view: ConfigureMvp.View) {
-        this.view = view
-    }
-
-    override fun bindCallbackService(service: CallbackService) {
-        callbackService = service
-    }
-
     override fun setCallbackEnabled(enabled: Boolean) {
         if (!enabled) {
             callbackService.setServiceEnabled(enabled)
