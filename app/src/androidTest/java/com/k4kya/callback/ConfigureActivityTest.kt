@@ -21,14 +21,14 @@ class ConfigureActivityTest {
 
     @Test
     fun startServiceWithBadPhrase() {
-        onView(withId(R.id.editTriggerPhrase)).perform(typeText(""))
-        onView(withId(R.id.btnToggleService)).perform(click())
-        onView(withId(R.id.btnToggleService)).check(matches(withText(R.string.start_callback_service)))
+        onView(withId(R.id.editTriggerPhrase)).perform(typeText("a"))
+        onView(withId(R.id.btnToggleService)).check(matches(not((isEnabled()))))
     }
 
     @Test
     fun startServiceWithValidPhrase() {
         onView(withId(R.id.editTriggerPhrase)).perform(typeText("valid"))
+        onView(withId(R.id.btnToggleService)).check(matches((isEnabled())))
         onView(withId(R.id.btnToggleService)).perform(click())
         onView(withId(R.id.btnToggleService)).check(matches(withText(R.string.stop_callback_service)))
     }
@@ -36,7 +36,6 @@ class ConfigureActivityTest {
     @Test
     fun updateServiceWithBadPhrase() {
         onView(withId(R.id.editTriggerPhrase)).perform(typeText("a"))
-        onView(withId(R.id.btnSetTriggerPhrase)).perform(click())
         onView(withId(R.id.btnToggleService)).check(matches(not((isEnabled()))))
     }
 
@@ -46,6 +45,5 @@ class ConfigureActivityTest {
         onView(withId(R.id.btnSetTriggerPhrase)).perform(click())
         onView(withId(R.id.btnToggleService)).check(matches((isEnabled())))
     }
-
 
 }

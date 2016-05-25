@@ -122,6 +122,7 @@ class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
         setupServiceToggleButton()
         setupTriggerPhraseUpdateButton()
         setupUseSpeaker()
+
     }
 
     private var textWatcher: Subscription? = null
