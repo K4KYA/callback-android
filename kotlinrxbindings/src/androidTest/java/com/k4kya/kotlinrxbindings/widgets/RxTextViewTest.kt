@@ -30,36 +30,55 @@ class RxTextViewTest {
     @Test @UiThreadTest
     fun testTextEventAfter() {
         val newVal = "he"
-        view.setText("h")
+        val beforeVal = "h"
+        view.setText(beforeVal)
         view.textEvents()
                 .filter { it is AfterTextChangedEvent }
                 .subscribe(testSubscriber)
         view.setText(newVal)
         testSubscriber.assertNoErrors()
-        testSubscriber.assertValue(AfterTextChangedEvent("he"))
+        testSubscriber.assertValue(AfterTextChangedEvent(newVal))
     }
 
     @Test @UiThreadTest
     fun testTextEventBefore() {
         val newVal = "he"
-        view.setText("h")
+        val beforeVal = "h"
+        view.setText(beforeVal)
         view.textEvents()
                 .filter { it is BeforeTextChangedEvent }
                 .subscribe(testSubscriber)
         view.setText(newVal)
         testSubscriber.assertNoErrors()
-        testSubscriber.assertValue(BeforeTextChangedEvent("h", 0, 1, 2))
+        testSubscriber.assertValue(BeforeTextChangedEvent(beforeVal, 0, beforeVal.length, newVal.length))
     }
 
     @Test @UiThreadTest
     fun testTextEventChanged() {
         val newVal = "he"
-        view.setText("h")
+        val beforeVal = "h"
+        view.setText(beforeVal)
         view.textEvents()
                 .filter { it is TextChangedEvent }
                 .subscribe(testSubscriber)
         view.setText(newVal)
         testSubscriber.assertNoErrors()
-        testSubscriber.assertValue(TextChangedEvent("he", 0, 1, 2))
+        testSubscriber.assertValue(TextChangedEvent(newVal, 0, beforeVal.length, newVal.length))
+    }
+
+    @Test @UiThreadTest
+    fun testEventsOrder() {
+        val newVal = "he"
+        val beforeVal = "h"
+        view.setText(beforeVal)
+        view.textEvents().subscribe(testSubscriber)
+        view.setText(newVal)
+        testSubscriber.assertNoErrors()
+        val expectedEvents = listOf(
+                BeforeTextChangedEvent(beforeVal, 0, beforeVal.length, newVal.length),
+                TextChangedEvent(newVal, 0, beforeVal.length, newVal.length),
+                AfterTextChangedEvent(newVal)
+        )
+        testSubscriber.assertReceivedOnNext(expectedEvents)
     }
 }
