@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
+import com.k4kya.kotlinrxbindings.views.PageChangeEvent
 import com.k4kya.kotlinrxbindings.views.PageChangeEventType
 import com.k4kya.kotlinrxbindings.views.pageChanges
 import rx.Subscription
@@ -17,50 +18,37 @@ import rx.android.schedulers.AndroidSchedulers
 class OnboardingActivity : AppCompatActivity() {
 
     val colours: List<Int>
-        get() {
-            return listOf(
+        get() = listOf(
                     ContextCompat.getColor(this, R.color.colorPrimary),
                     ContextCompat.getColor(this, R.color.colorAccent),
-                    ContextCompat.getColor(this, R.color.action_red))
-        }
+                ContextCompat.getColor(this, R.color.action_red)
+        )
 
     val evaluator = ArgbEvaluator()
 
     var currentPage = 0
 
     val indicators: List<ImageView>
-        get() {
-            return listOf(
+        get() = listOf(
                     findViewById(R.id.intro_indicator_0) as ImageView,
                     findViewById(R.id.intro_indicator_1) as ImageView,
                     findViewById(R.id.intro_indicator_2) as ImageView
-            )
-        }
+        )
 
     val viewPager: ViewPager?
-        get() {
-            return findViewById(R.id.viewPager) as ViewPager?
-        }
+        get() = findViewById(R.id.viewPager) as ViewPager?
 
     val nextButton: ImageButton?
-        get() {
-            return findViewById(R.id.intro_btn_next) as ImageButton?
-        }
+        get() = findViewById(R.id.intro_btn_next) as ImageButton?
 
     val finishButton: Button?
-        get() {
-            return findViewById(R.id.intro_btn_finish) as Button?
-        }
+        get() = findViewById(R.id.intro_btn_finish) as Button?
 
     val skipButton: Button?
-        get() {
-            return findViewById(R.id.intro_btn_skip) as Button?
-        }
+        get() = findViewById(R.id.intro_btn_skip) as Button?
 
     val sectionsPagerAdapter: OnboardingPagerAdapter
-        get() {
-            return OnboardingPagerAdapter(supportFragmentManager)
-        }
+        get() = OnboardingPagerAdapter(supportFragmentManager)
 
     private var viewPagerEvents: Subscription? = null
 
@@ -90,7 +78,7 @@ class OnboardingActivity : AppCompatActivity() {
     }
 
     fun updateIndicators(currentPage: Int) {
-        indicators.mapIndexed {
+        indicators.forEachIndexed {
             i, imageView ->
             imageView.setBackgroundResource(if (i == currentPage) R.drawable.indicator_selected else R.drawable.indicator_unselected)
         }
@@ -105,25 +93,33 @@ class OnboardingActivity : AppCompatActivity() {
                     @Suppress("NON_EXHAUSTIVE_WHEN")
                     when (it.type) {
                         PageChangeEventType.pageScrolled -> {
-                            if (it.position != null && it.positionOffset != null) {
-                                val position = it.position!!
-                                val positionOffset = it.positionOffset!!
-                                val updatedColour = evaluator.evaluate(
-                                        positionOffset,
-                                        colours[position],
-                                        colours[(if (position == 2) position else position + 1)]
-                                ) as Int
-                                viewPager?.setBackgroundColor(updatedColour)
-                            }
+                            pageScrolled(it)
                         }
                         PageChangeEventType.pageSelected -> {
-                            currentPage = it.position!!
-                            updateIndicators(currentPage)
-                            viewPager?.setBackgroundColor(colours[currentPage])
-                            nextButton?.visibility = if (currentPage == 2) View.GONE else View.VISIBLE
-                            finishButton?.visibility = if (currentPage == 2) View.VISIBLE else View.GONE
+                            pageSelected(it)
                         }
                     }
                 }
+    }
+
+    private fun pageSelected(event: PageChangeEvent) {
+        currentPage = event.position!!
+        updateIndicators(currentPage)
+        viewPager?.setBackgroundColor(colours[currentPage])
+        nextButton?.visibility = if (currentPage == 2) View.GONE else View.VISIBLE
+        finishButton?.visibility = if (currentPage == 2) View.VISIBLE else View.GONE
+    }
+
+    private fun pageScrolled(event: PageChangeEvent) {
+        if (event.position != null && event.positionOffset != null) {
+            val position = event.position!!
+            val positionOffset = event.positionOffset!!
+            val updatedColour = evaluator.evaluate(
+                    positionOffset,
+                    colours[position],
+                    colours[(if (position == 2) position else position + 1)]
+            ) as Int
+            viewPager?.setBackgroundColor(updatedColour)
+        }
     }
 }
