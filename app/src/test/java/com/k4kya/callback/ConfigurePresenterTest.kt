@@ -124,4 +124,12 @@ class ConfigurePresenterTest {
         assertTrue(mockService.getStartOnSpeakerStatus())
     }
 
+    @Test
+    fun cantSetInvalidTriggerPhrase() {
+        mockService.setSpeakerphoneEnabled(false)
+        val subject = ConfigurePresenter(mockService, mockView)
+        subject.setTriggerPhrase("bad")
+        assertFalse(mockService.getServiceStatus())
+    }
+
 }
