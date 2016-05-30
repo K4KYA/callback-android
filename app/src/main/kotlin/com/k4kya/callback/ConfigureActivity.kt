@@ -10,7 +10,6 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.text.Editable
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
@@ -26,6 +25,8 @@ import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 
 class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
+
+    var presenter : ConfigureMvp.Presenter? = null
 
     val requiredPermissions = listOf(
             Manifest.permission.CALL_PHONE,
@@ -46,15 +47,13 @@ class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
     val checkUseSpeaker: CheckBox?
         get() = findOptional(R.id.checkUseSpeaker)
 
-    val presenter: ConfigureMvp.Presenter
-        get() = ConfigurePresenter(PhoneCallbackService(this), this)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         showOnboardingIfNecessary();
         checkPermissions()
         setContentView(R.layout.activity_main)
         setSupportActionBar(actionbar)
+        presenter = ConfigurePresenter(PhoneCallbackService(this), this)
         setupUI()
     }
 
@@ -122,7 +121,6 @@ class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
         setupServiceToggleButton()
         setupTriggerPhraseUpdateButton()
         setupUseSpeaker()
-
     }
 
     private var textWatcher: Subscription? = null
@@ -135,7 +133,7 @@ class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
                     when (it) {
                         is AfterTextChangedEvent -> {
                             if (it.value != null) {
-                                presenter.setTriggerPhrase(it.value.toString())
+                                presenter?.setTriggerPhrase(it.value.toString())
                             }
                         }
                     }
@@ -145,19 +143,19 @@ class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
     fun setupUseSpeaker() {
         checkUseSpeaker?.setOnCheckedChangeListener {
             view, checked ->
-            presenter.setStartOnSpeaker(checked)
+            presenter?.setStartOnSpeaker(checked)
         }
     }
 
     fun setupTriggerPhraseUpdateButton() {
         btnSetTriggerPhrase?.setOnClickListener {
-            presenter.setTriggerPhrase(editTriggerPhrase?.text.toString())
+            presenter?.setTriggerPhrase(editTriggerPhrase?.text.toString())
         }
     }
 
     fun setupServiceToggleButton() {
         val btnToggle = btnToggle
-        btnToggle?.setOnClickListener { presenter.toggleCallbackEnabled() }
+        btnToggle?.setOnClickListener { presenter?.toggleCallbackEnabled() }
     }
 
     fun getSharedPrefs(context: Context?): SharedPreferences? {
@@ -173,7 +171,7 @@ class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
             val index = permissions.indexOf(it)
             val granted = grantResults[index]
             if (granted != PackageManager.PERMISSION_GRANTED) {
-                presenter.setCallbackEnabled(false)
+                presenter?.setCallbackEnabled(false)
             }
         }
     }
@@ -190,8 +188,8 @@ class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
         btnToggle?.text = status
     }
 
-    override fun setTriggerPhrase(trigger: CharSequence) {
-        editTriggerPhrase?.text = trigger as Editable
+    override fun setTriggerPhrase(trigger: CharSequence?) {
+        editTriggerPhrase?.setText(trigger!!)
     }
 
     override fun setSpeakerEnabled(enabled: Boolean) {

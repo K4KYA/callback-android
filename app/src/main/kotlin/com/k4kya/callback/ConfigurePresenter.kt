@@ -4,6 +4,19 @@ class ConfigurePresenter(override var callbackService: CallbackService, override
 
     val TRIGGER_MIN_LENGTH = 4
 
+    init {
+        setupView()
+    }
+
+    private fun setupView() {
+        val enabled = callbackService.getServiceStatus()
+        view.updateStatusText(enabled)
+        view.setSpeakerEnabled(enabled)
+        val currentTrigger = callbackService.getTriggerPhrase()
+        view.setTriggerPhrase(currentTrigger)
+        view.setServiceToggleButtonEnabled(if (validateTriggerPhrase(currentTrigger)) true else false)
+    }
+
     override fun setCallbackEnabled(enabled: Boolean) {
         if (!enabled) {
             callbackService.setServiceEnabled(enabled)
@@ -39,5 +52,5 @@ class ConfigurePresenter(override var callbackService: CallbackService, override
         setCallbackEnabled(!callbackService.getServiceStatus())
     }
 
-    fun validateTriggerPhrase(phrase: String) = phrase.length > TRIGGER_MIN_LENGTH
+    fun validateTriggerPhrase(phrase: String?) = if (phrase == null) false else phrase.length > TRIGGER_MIN_LENGTH
 }

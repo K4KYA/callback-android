@@ -6,7 +6,7 @@ interface ConfigureMvp {
         fun showMessage(resId: Int)
         fun showMessage(message: String)
         fun setCallbackStatusText(status: String)
-        fun setTriggerPhrase(trigger: CharSequence)
+        fun setTriggerPhrase(trigger: CharSequence?)
         fun setSpeakerEnabled(enabled: Boolean)
         fun getLatestTriggerPhrase(): String?
         fun updateStatusText(enabled: Boolean)

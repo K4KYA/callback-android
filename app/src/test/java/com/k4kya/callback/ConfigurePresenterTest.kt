@@ -54,7 +54,7 @@ class ConfigurePresenterTest {
 
         }
 
-        override fun setTriggerPhrase(trigger: CharSequence) {
+        override fun setTriggerPhrase(trigger: CharSequence?) {
             this.trigger = trigger.toString()
         }
 
@@ -100,9 +100,9 @@ class ConfigurePresenterTest {
 
     @Test
     fun testSetEnabledWithBadTrigger() {
+        val subject = ConfigurePresenter(mockService, mockView)
         mockService.setServiceEnabled(false)
         mockView.setTriggerPhrase("bad")
-        val subject = ConfigurePresenter(mockService, mockView)
         subject.setCallbackEnabled(true)
         assertFalse(mockService.getServiceStatus())
     }

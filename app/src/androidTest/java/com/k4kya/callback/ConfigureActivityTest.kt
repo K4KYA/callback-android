@@ -1,13 +1,13 @@
 package com.k4kya.callback
 
 import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.action.ViewActions.click
-import android.support.test.espresso.action.ViewActions.typeText
+import android.support.test.espresso.action.ViewActions.*
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import org.hamcrest.Matchers.not
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,6 +18,11 @@ class ConfigureActivityTest {
 
     @Rule @JvmField
     val activity = ActivityTestRule<ConfigureActivity>(ConfigureActivity::class.java)
+
+    @Before
+    fun setup() {
+        onView(withId(R.id.editTriggerPhrase)).perform(clearText())
+    }
 
     @Test
     fun startServiceWithBadPhrase() {
