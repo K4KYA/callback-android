@@ -9,6 +9,10 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
+import com.k4kya.kotlinrxbindings.views.PageChangeEventType
+import com.k4kya.kotlinrxbindings.views.pageChanges
+import rx.Subscription
+import rx.android.schedulers.AndroidSchedulers
 
 class OnboardingActivity : AppCompatActivity() {
 
@@ -58,11 +62,22 @@ class OnboardingActivity : AppCompatActivity() {
             return OnboardingPagerAdapter(supportFragmentManager)
         }
 
+    private var viewPagerEvents: Subscription? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_onboarding)
-        setupViewPager()
         setupButtons()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        setupViewPager()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewPagerEvents?.unsubscribe()
     }
 
     fun setupButtons() {
@@ -83,26 +98,32 @@ class OnboardingActivity : AppCompatActivity() {
 
     fun setupViewPager() {
         viewPager?.adapter = sectionsPagerAdapter
-        viewPager?.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageSelected(position: Int) {
-                currentPage = position
-                updateIndicators(currentPage)
-                viewPager?.setBackgroundColor(colours[position])
-                nextButton?.visibility = if (position == 2) View.GONE else View.VISIBLE
-                finishButton?.visibility = if (position == 2) View.VISIBLE else View.GONE
-            }
-
-            override fun onPageScrollStateChanged(state: Int) {
-            }
-
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-                var updatedColour = evaluator.evaluate(
-                        positionOffset,
-                        colours[position],
-                        colours[( if (position == 2) position else position + 1)]
-                ) as Int
-                viewPager?.setBackgroundColor(updatedColour)
-            }
-        })
+        viewPagerEvents = viewPager?.pageChanges()
+                ?.filter { it.type == PageChangeEventType.pageScrolled || it.type == PageChangeEventType.pageSelected }
+                ?.subscribeOn(AndroidSchedulers.mainThread())
+                ?.subscribe {
+                    @Suppress("NON_EXHAUSTIVE_WHEN")
+                    when (it.type) {
+                        PageChangeEventType.pageScrolled -> {
+                            if (it.position != null && it.positionOffset != null) {
+                                val position = it.position!!
+                                val positionOffset = it.positionOffset!!
+                                val updatedColour = evaluator.evaluate(
+                                        positionOffset,
+                                        colours[position],
+                                        colours[(if (position == 2) position else position + 1)]
+                                ) as Int
+                                viewPager?.setBackgroundColor(updatedColour)
+                            }
+                        }
+                        PageChangeEventType.pageSelected -> {
+                            currentPage = it.position!!
+                            updateIndicators(currentPage)
+                            viewPager?.setBackgroundColor(colours[currentPage])
+                            nextButton?.visibility = if (currentPage == 2) View.GONE else View.VISIBLE
+                            finishButton?.visibility = if (currentPage == 2) View.VISIBLE else View.GONE
+                        }
+                    }
+                }
     }
 }
