@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout android:id="@+id/main_content"
+<android.support.design.widget.CoordinatorLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_content"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -74,27 +75,14 @@
 
         </LinearLayout>
 
-
         <Button
-            android:id="@+id/intro_btn_finish"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|center"
-            android:text="@string/Done"
-            android:textColor="@android:color/white"
-            android:visibility="gone" />
-
-        <ImageButton
             android:id="@+id/intro_btn_next"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|center"
-            android:contentDescription="@string/next_button"
             android:padding="@dimen/activity_horizontal_margin"
-            android:src="@drawable/chevron_right"
-            android:tint="@android:color/white" />
+            android:text="@string/next_button"/>
 
 
     </FrameLayout>
