@@ -32,15 +32,6 @@ class ConfigurePresenterTest {
     }
 
     @Test
-    fun testToggleService() {
-        val subject = ConfigurePresenter(mockService, mockView)
-        subject.toggleCallbackEnabled()
-        verify(mockService).setServiceEnabled(eq(true))
-        subject.toggleCallbackEnabled()
-        verify(mockService).setServiceEnabled(eq(false))
-    }
-
-    @Test
     fun testSetEnabledWithBadTrigger() {
         whenever(mockView.getLatestTriggerPhrase()).thenReturn("bad")
         val subject = ConfigurePresenter(mockService, mockView)
