@@ -1,4 +1,4 @@
-package com.k4kya.callback
+package com.k4kya.callback.onboarding
 
 import android.animation.ArgbEvaluator
 import android.os.Bundle
@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
+import com.k4kya.callback.R
 import com.k4kya.kotlinrxbindings.views.PageChangeEvent
 import com.k4kya.kotlinrxbindings.views.PageChangeEventType
 import com.k4kya.kotlinrxbindings.views.pageChanges

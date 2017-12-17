@@ -1,10 +1,11 @@
-package com.k4kya.callback
+package com.k4kya.callback.external
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import android.webkit.WebView
+import com.k4kya.callback.R
 import com.k4kya.callback.util.bindView
 
 class WebViewActivity : AppCompatActivity() {

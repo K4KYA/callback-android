@@ -1,4 +1,4 @@
-package com.k4kya.callback
+package com.k4kya.callback.service
 
 interface CallbackService {
     fun setServiceEnabled(enabled: Boolean)

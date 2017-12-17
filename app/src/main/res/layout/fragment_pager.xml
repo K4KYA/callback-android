@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/activity_horizontal_margin"
-    tools:context="com.k4kya.callback.OnboardingFragment">
+    tools:context="com.k4kya.callback.onboarding.OnboardingFragment">
 
 
     <FrameLayout

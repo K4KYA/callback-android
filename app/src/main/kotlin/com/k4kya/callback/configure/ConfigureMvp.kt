@@ -1,4 +1,6 @@
-package com.k4kya.callback
+package com.k4kya.callback.configure
+
+import com.k4kya.callback.service.CallbackService
 
 interface ConfigureMvp {
 
@@ -14,7 +16,7 @@ interface ConfigureMvp {
     }
 
     interface Presenter {
-        var view: ConfigureMvp.View
+        var view: View
         var callbackService: CallbackService
         fun setCallbackEnabled(enabled: Boolean)
         fun setTriggerPhrase(triggerPhrase: String)

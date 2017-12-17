@@ -1,4 +1,4 @@
-package com.k4kya.callback
+package com.k4kya.callback.about
 
 import android.content.Intent
 import android.net.Uri
@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import android.widget.TextView
+import com.k4kya.callback.R
 import com.k4kya.callback.util.bindView
 
 class AboutActivity : AppCompatActivity() {

@@ -1,4 +1,4 @@
-package com.k4kya.callback
+package com.k4kya.callback.configure
 
 import android.Manifest
 import android.content.Context
@@ -15,6 +15,11 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import com.k4kya.callback.onboarding.OnboardingActivity
+import com.k4kya.callback.service.PhoneCallbackService
+import com.k4kya.callback.R
+import com.k4kya.callback.service.SmsListener
+import com.k4kya.callback.about.AboutActivity
 import com.k4kya.callback.util.bindView
 import com.k4kya.callback.util.intentFor
 import com.k4kya.kotlinrxbindings.widgets.AfterTextChangedEvent

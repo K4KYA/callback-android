@@ -1,4 +1,4 @@
-package com.k4kya.callback
+package com.k4kya.callback.service
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -8,6 +8,7 @@ import android.net.Uri
 import android.provider.Telephony
 import android.telecom.TelecomManager
 import android.telephony.TelephonyManager
+import com.k4kya.callback.BuildConfig
 
 class SmsListener : BroadcastReceiver() {
 

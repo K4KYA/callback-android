@@ -1,4 +1,4 @@
-package com.k4kya.callback
+package com.k4kya.callback.onboarding
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import com.k4kya.callback.R
 
 class OnboardingFragment : Fragment() {
 

@@ -1,4 +1,4 @@
-package com.k4kya.callback
+package com.k4kya.callback.onboarding
 
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
