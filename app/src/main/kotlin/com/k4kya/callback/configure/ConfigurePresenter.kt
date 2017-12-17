@@ -4,8 +4,6 @@ import com.k4kya.callback.service.CallbackService
 
 class ConfigurePresenter(override var callbackService: CallbackService, override var view: ConfigureMvp.View) : ConfigureMvp.Presenter {
 
-    val TRIGGER_MIN_LENGTH = 4
-
     init {
         setupView()
     }
@@ -16,7 +14,7 @@ class ConfigurePresenter(override var callbackService: CallbackService, override
         view.setSpeakerEnabled(enabled)
         val currentTrigger = callbackService.getTriggerPhrase()
         view.setTriggerPhrase(currentTrigger)
-        view.setServiceToggleButtonEnabled(if (validateTriggerPhrase(currentTrigger)) true else false)
+        view.setServiceToggleButtonEnabled(validateTriggerPhrase(currentTrigger))
     }
 
     override fun setCallbackEnabled(enabled: Boolean) {
@@ -54,5 +52,12 @@ class ConfigurePresenter(override var callbackService: CallbackService, override
         setCallbackEnabled(!callbackService.getServiceStatus())
     }
 
-    fun validateTriggerPhrase(phrase: String?) = if (phrase == null) false else phrase.length > TRIGGER_MIN_LENGTH
+    fun validateTriggerPhrase(phrase: String?) = when (phrase.isNullOrBlank()) {
+        true -> false
+        false -> phrase!!.length > TRIGGER_MIN_LENGTH
+    }
+
+    companion object {
+        const val TRIGGER_MIN_LENGTH = 4
+    }
 }
