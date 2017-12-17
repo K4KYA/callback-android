@@ -1,82 +1,26 @@
 package com.k4kya.callback
 
+import com.nhaarman.mockito_kotlin.eq
+import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
 
 class ConfigurePresenterTest {
 
-    val mockService = object : CallbackService {
-
-        var enabled = false
-        var trigger: String? = null
-        var useSpeaker = false
-
-
-        override fun setServiceEnabled(enabled: Boolean) {
-            this.enabled = enabled
-        }
-
-        override fun setTriggerPhrase(trigger: String) {
-            this.trigger = trigger
-        }
-
-        override fun setSpeakerphoneEnabled(enabled: Boolean) {
-            this.useSpeaker = enabled
-        }
-
-        override fun getTriggerPhrase() = trigger
-
-        override fun getServiceStatus() = enabled
-
-        override fun getStartOnSpeakerStatus() = useSpeaker
-
-    }
-
-    val mockView = object : ConfigureMvp.View {
-
-        override fun setServiceToggleButtonEnabled(enabled: Boolean) {
-
-        }
-
-        var trigger: String? = null
-
-        override fun showMessage(resId: Int) {
-
-        }
-
-        override fun showMessage(message: String) {
-
-        }
-
-        override fun setCallbackStatusText(status: String) {
-
-        }
-
-        override fun setTriggerPhrase(trigger: CharSequence?) {
-            this.trigger = trigger.toString()
-        }
-
-        override fun setSpeakerEnabled(enabled: Boolean) {
-
-        }
-
-        override fun getLatestTriggerPhrase(): String? {
-            return trigger
-        }
-
-        override fun updateStatusText(enabled: Boolean) {
-
-        }
-
-    }
+    @Mock lateinit var mockService : CallbackService
+    @Mock lateinit var mockView : ConfigureMvp.View
 
     @Before
     fun setup() {
-        mockService.setServiceEnabled(false)
-        mockService.setTriggerPhrase("valid")
-        mockView.setTriggerPhrase("valid")
+        MockitoAnnotations.initMocks(this)
+        whenever(mockService.getServiceStatus()).thenReturn(false)
+        whenever(mockService.getTriggerPhrase()).thenReturn("valid")
+        whenever(mockView.getLatestTriggerPhrase()).thenReturn("valid")
     }
 
     @Test
@@ -89,47 +33,41 @@ class ConfigurePresenterTest {
 
     @Test
     fun testToggleService() {
-        mockService.setServiceEnabled(false)
-        mockService.setTriggerPhrase("validPhrase")
         val subject = ConfigurePresenter(mockService, mockView)
         subject.toggleCallbackEnabled()
-        assertTrue(mockService.getServiceStatus())
+        verify(mockService).setServiceEnabled(eq(true))
         subject.toggleCallbackEnabled()
-        assertFalse(mockService.getServiceStatus())
+        verify(mockService).setServiceEnabled(eq(false))
     }
 
     @Test
     fun testSetEnabledWithBadTrigger() {
+        whenever(mockView.getLatestTriggerPhrase()).thenReturn("bad")
         val subject = ConfigurePresenter(mockService, mockView)
-        mockService.setServiceEnabled(false)
-        mockView.setTriggerPhrase("bad")
         subject.setCallbackEnabled(true)
         assertFalse(mockService.getServiceStatus())
     }
 
     @Test
     fun testSetEnabledWithGoodTrigger() {
-        mockService.setServiceEnabled(false)
-        mockView.setTriggerPhrase("valid")
         val subject = ConfigurePresenter(mockService, mockView)
         subject.setCallbackEnabled(true)
-        assertTrue(mockService.getServiceStatus())
+        verify(mockService).setServiceEnabled(eq(true))
     }
 
     @Test
     fun testStartOnSpeaker() {
-        mockService.setSpeakerphoneEnabled(false)
         val subject = ConfigurePresenter(mockService, mockView)
         subject.setStartOnSpeaker(true)
-        assertTrue(mockService.getStartOnSpeakerStatus())
+        verify(mockService).setSpeakerphoneEnabled(eq(true))
     }
 
     @Test
     fun cantSetInvalidTriggerPhrase() {
-        mockService.setSpeakerphoneEnabled(false)
+        whenever(mockService.getStartOnSpeakerStatus()).thenReturn(false)
         val subject = ConfigurePresenter(mockService, mockView)
         subject.setTriggerPhrase("bad")
-        assertFalse(mockService.getServiceStatus())
+        verify(mockService).setServiceEnabled(eq(false))
     }
 
 }

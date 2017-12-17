@@ -15,37 +15,26 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import com.k4kya.callback.util.bindView
+import com.k4kya.callback.util.intentFor
 import com.k4kya.kotlinrxbindings.widgets.AfterTextChangedEvent
 import com.k4kya.kotlinrxbindings.widgets.textEvents
-import org.jetbrains.anko.enabled
-import org.jetbrains.anko.find
-import org.jetbrains.anko.findOptional
-import org.jetbrains.anko.startActivity
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 
 class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
 
-    var presenter : ConfigureMvp.Presenter? = null
+    private var presenter: ConfigureMvp.Presenter? = null
 
-    val requiredPermissions = listOf(
+    private val requiredPermissions = listOf(
             Manifest.permission.CALL_PHONE,
             Manifest.permission.RECEIVE_SMS
     )
-    val actionbar: Toolbar?
-        get() = findOptional(R.id.toolbar)
-
-    val btnToggle: Button?
-        get() = findOptional(R.id.btnToggleService)
-
-    val editTriggerPhrase: EditText?
-        get() = findOptional(R.id.editTriggerPhrase)
-
-    val btnSetTriggerPhrase: Button?
-        get() = findOptional(R.id.btnSetTriggerPhrase)
-
-    val checkUseSpeaker: CheckBox?
-        get() = findOptional(R.id.checkUseSpeaker)
+    private val actionbar: Toolbar by bindView(R.id.toolbar)
+    private val btnToggle: Button by bindView(R.id.btnToggleService)
+    private val editTriggerPhrase: EditText by bindView(R.id.editTriggerPhrase)
+    private val btnSetTriggerPhrase: Button by bindView(R.id.btnSetTriggerPhrase)
+    private val checkUseSpeaker: CheckBox by bindView(R.id.checkUseSpeaker)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,36 +57,33 @@ class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
         textWatcher?.unsubscribe()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu, menu)
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item != null) {
-            when (item.itemId) {
-                R.id.menu_about -> {
-                    startAboutActivity(); return true
-                }
-                else -> return false
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_about -> {
+                startAboutActivity(); true
             }
+            else -> false
         }
-        return false
     }
 
-    fun showOnboardingIfNecessary() {
+    private fun showOnboardingIfNecessary() {
         val shown = getSharedPrefs(this)?.getBoolean(getString(R.string.intro_shown), false) ?: false
         if (!shown) {
-            startActivity<OnboardingActivity>()
+            startActivity(intentFor<OnboardingActivity>())
             getSharedPrefs(this)?.edit()?.putBoolean(getString(R.string.intro_shown), true)?.apply()
         }
     }
 
-    fun startAboutActivity() {
-        startActivity<AboutActivity>()
+    private fun startAboutActivity() {
+        startActivity(intentFor<AboutActivity>())
     }
 
-    fun checkPermissions() {
+    private fun checkPermissions() {
         val permissionsRequestedFlags = 2
         var permissionsToRequest = emptyList<String>()
 
@@ -107,17 +93,17 @@ class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
             }
         }
 
-        if (permissionsToRequest.size > 0) {
+        if (permissionsToRequest.isNotEmpty()) {
             ActivityCompat.requestPermissions(this, permissionsToRequest.toTypedArray(), permissionsRequestedFlags)
         }
     }
 
-    fun hasPermission(permission: String): Boolean {
+    private fun hasPermission(permission: String): Boolean {
         val status = ContextCompat.checkSelfPermission(this, permission)
         return (status == PackageManager.PERMISSION_GRANTED)
     }
 
-    fun setupUI() {
+    private fun setupUI() {
         setupServiceToggleButton()
         setupTriggerPhraseUpdateButton()
         setupUseSpeaker()
@@ -126,10 +112,10 @@ class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
     private var textWatcher: Subscription? = null
 
     private fun setupTextWatcher() {
-        textWatcher = editTriggerPhrase?.textEvents()
-                ?.filter { it is AfterTextChangedEvent }
-                ?.subscribeOn(AndroidSchedulers.mainThread())
-                ?.subscribe {
+        textWatcher = editTriggerPhrase.textEvents()
+                .filter { it is AfterTextChangedEvent }
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe {
                     when (it) {
                         is AfterTextChangedEvent -> {
                             if (it.value != null) {
@@ -140,30 +126,29 @@ class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
                 }
     }
 
-    fun setupUseSpeaker() {
-        checkUseSpeaker?.setOnCheckedChangeListener {
-            view, checked ->
+    private fun setupUseSpeaker() {
+        checkUseSpeaker.setOnCheckedChangeListener { _, checked ->
             presenter?.setStartOnSpeaker(checked)
         }
     }
 
-    fun setupTriggerPhraseUpdateButton() {
-        btnSetTriggerPhrase?.setOnClickListener {
-            presenter?.setTriggerPhrase(editTriggerPhrase?.text.toString())
+    private fun setupTriggerPhraseUpdateButton() {
+        btnSetTriggerPhrase.setOnClickListener {
+            presenter?.setTriggerPhrase(editTriggerPhrase.text.toString())
         }
     }
 
-    fun setupServiceToggleButton() {
+    private fun setupServiceToggleButton() {
         val btnToggle = btnToggle
-        btnToggle?.setOnClickListener { presenter?.toggleCallbackEnabled() }
+        btnToggle.setOnClickListener { presenter?.toggleCallbackEnabled() }
     }
 
-    fun getSharedPrefs(context: Context?): SharedPreferences? {
+    private fun getSharedPrefs(context: Context?): SharedPreferences? {
         return context?.getSharedPreferences(SmsListener.CALLBACK_SHARED_PREFS_KEY, Context.MODE_PRIVATE)
     }
 
     override fun updateStatusText(enabled: Boolean) {
-        btnToggle?.text = getString(if (enabled) R.string.stop_callback_service else R.string.start_callback_service)
+        btnToggle.text = getString(if (enabled) R.string.stop_callback_service else R.string.start_callback_service)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -181,24 +166,24 @@ class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
     }
 
     override fun showMessage(message: String) {
-        Snackbar.make(find(android.R.id.content), message, Snackbar.LENGTH_LONG).show()
+        Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show()
     }
 
     override fun setCallbackStatusText(status: String) {
-        btnToggle?.text = status
+        btnToggle.text = status
     }
 
     override fun setTriggerPhrase(trigger: CharSequence?) {
-        editTriggerPhrase?.setText(trigger!!)
+        editTriggerPhrase.setText(trigger!!)
     }
 
     override fun setSpeakerEnabled(enabled: Boolean) {
-        checkUseSpeaker?.isChecked = enabled
+        checkUseSpeaker.isChecked = enabled
     }
 
     override fun setServiceToggleButtonEnabled(enabled: Boolean) {
-        btnToggle?.enabled = enabled
+        btnToggle.isEnabled = enabled
     }
 
-    override fun getLatestTriggerPhrase() = editTriggerPhrase?.text?.toString()
+    override fun getLatestTriggerPhrase() = editTriggerPhrase.text?.toString()
 }

@@ -1,29 +1,38 @@
 package com.k4kya.callback
 
+import android.content.Intent
 import android.os.Bundle
 import android.preference.Preference
 import android.preference.PreferenceFragment
-import org.jetbrains.anko.email
-import org.jetbrains.anko.startActivity
+import com.k4kya.callback.util.intentFor
 
 class SettingsFragment : PreferenceFragment() {
 
-    val sendFeedback: Preference
+    private val sendFeedback: Preference
         get() = findPreference(getString(R.string.send_feedback))
 
-    val showIntro: Preference
+    private val showIntro: Preference
         get() = findPreference(getString(R.string.intro))
 
-    val showOpenSourceLicenses: Preference
+    private val showOpenSourceLicenses: Preference
         get() = findPreference(getString(R.string.open_source))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         addPreferencesFromResource(R.xml.preferences)
-        sendFeedback.setOnPreferenceClickListener { preference ->
-                    email("amal.kakaiya@gmail.com", "Callback v" + getString(R.string.version))
+        sendFeedback.setOnPreferenceClickListener { _ ->
+            startActivity(Intent().apply {
+                action = Intent.ACTION_SENDTO
+                type = "text/html"
+                putExtra(Intent.EXTRA_EMAIL, "amal.kakaiya@gmail.com")
+                putExtra(Intent.EXTRA_SUBJECT, "Feedback for Callback v" + getString(R.string.version))
+            }); true
         }
-        showIntro.setOnPreferenceClickListener { preference -> startActivity<OnboardingActivity>(); true }
-        showOpenSourceLicenses.setOnPreferenceClickListener { preference -> startActivity<WebViewActivity>("content" to "Open Source Licenses"); true }
+        showIntro.setOnPreferenceClickListener { _ -> startActivity(intentFor<OnboardingActivity>()); true }
+        showOpenSourceLicenses.setOnPreferenceClickListener { _ ->
+            startActivity(intentFor<WebViewActivity>().apply {
+                putExtra("content", "Open Source Licenses")
+            }); true
+        }
     }
 }

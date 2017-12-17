@@ -17,37 +17,37 @@ import rx.android.schedulers.AndroidSchedulers
 
 class OnboardingActivity : AppCompatActivity() {
 
-    val colours: List<Int>
+    private val colours: List<Int>
         get() = listOf(
-                    ContextCompat.getColor(this, R.color.colorPrimary),
-                    ContextCompat.getColor(this, R.color.colorAccent),
+                ContextCompat.getColor(this, R.color.colorPrimary),
+                ContextCompat.getColor(this, R.color.colorAccent),
                 ContextCompat.getColor(this, R.color.action_red)
         )
 
-    val evaluator = ArgbEvaluator()
+    private val evaluator = ArgbEvaluator()
 
-    var currentPage = 0
+    private var currentPage = 0
 
-    val indicators: List<ImageView>
+    private val indicators: List<ImageView>
         get() = listOf(
-                    findViewById(R.id.intro_indicator_0) as ImageView,
-                    findViewById(R.id.intro_indicator_1) as ImageView,
-                    findViewById(R.id.intro_indicator_2) as ImageView
+                findViewById(R.id.intro_indicator_0),
+                findViewById(R.id.intro_indicator_1),
+                findViewById(R.id.intro_indicator_2)
         )
 
-    val viewPager: ViewPager?
-        get() = findViewById(R.id.viewPager) as ViewPager?
+    private val viewPager: ViewPager
+        get() = findViewById(R.id.viewPager)
 
-    val nextButton: ImageButton?
-        get() = findViewById(R.id.intro_btn_next) as ImageButton?
+    private val nextButton: ImageButton
+        get() = findViewById(R.id.intro_btn_next)
 
-    val finishButton: Button?
-        get() = findViewById(R.id.intro_btn_finish) as Button?
+    private val finishButton: Button
+        get() = findViewById(R.id.intro_btn_finish)
 
-    val skipButton: Button?
-        get() = findViewById(R.id.intro_btn_skip) as Button?
+    private val skipButton: Button
+        get() = findViewById(R.id.intro_btn_skip)
 
-    val sectionsPagerAdapter: OnboardingPagerAdapter
+    private val sectionsPagerAdapter: OnboardingPagerAdapter
         get() = OnboardingPagerAdapter(supportFragmentManager)
 
     private var viewPagerEvents: Subscription? = null
@@ -68,26 +68,25 @@ class OnboardingActivity : AppCompatActivity() {
         viewPagerEvents?.unsubscribe()
     }
 
-    fun setupButtons() {
-        nextButton?.setOnClickListener {
+    private fun setupButtons() {
+        nextButton.setOnClickListener {
             currentPage += 1
-            viewPager?.setCurrentItem(currentPage, true)
+            viewPager.setCurrentItem(currentPage, true)
         }
-        skipButton?.setOnClickListener { finish() }
-        finishButton?.setOnClickListener { finish() }
+        skipButton.setOnClickListener { finish() }
+        finishButton.setOnClickListener { finish() }
     }
 
-    fun updateIndicators(currentPage: Int) {
-        indicators.forEachIndexed {
-            i, imageView ->
+    private fun updateIndicators(currentPage: Int) {
+        indicators.forEachIndexed { i, imageView ->
             imageView.setBackgroundResource(if (i == currentPage) R.drawable.indicator_selected else R.drawable.indicator_unselected)
         }
     }
 
-    fun setupViewPager() {
-        viewPager?.adapter = sectionsPagerAdapter
-        viewPagerEvents = viewPager?.pageChanges()
-                ?.filter { it.type == PageChangeEventType.pageScrolled || it.type == PageChangeEventType.pageSelected }
+    private fun setupViewPager() {
+        viewPager.adapter = sectionsPagerAdapter
+        viewPagerEvents = viewPager.pageChanges()
+                .filter { it.type == PageChangeEventType.pageScrolled || it.type == PageChangeEventType.pageSelected }
                 ?.subscribeOn(AndroidSchedulers.mainThread())
                 ?.subscribe {
                     @Suppress("NON_EXHAUSTIVE_WHEN")
@@ -105,9 +104,9 @@ class OnboardingActivity : AppCompatActivity() {
     private fun pageSelected(event: PageChangeEvent) {
         currentPage = event.position!!
         updateIndicators(currentPage)
-        viewPager?.setBackgroundColor(colours[currentPage])
-        nextButton?.visibility = if (currentPage == 2) View.GONE else View.VISIBLE
-        finishButton?.visibility = if (currentPage == 2) View.VISIBLE else View.GONE
+        viewPager.setBackgroundColor(colours[currentPage])
+        nextButton.visibility = if (currentPage == 2) View.GONE else View.VISIBLE
+        finishButton.visibility = if (currentPage == 2) View.VISIBLE else View.GONE
     }
 
     private fun pageScrolled(event: PageChangeEvent) {
@@ -119,7 +118,7 @@ class OnboardingActivity : AppCompatActivity() {
                     colours[position],
                     colours[(if (position == 2) position else position + 1)]
             ) as Int
-            viewPager?.setBackgroundColor(updatedColour)
+            viewPager.setBackgroundColor(updatedColour)
         }
     }
 }

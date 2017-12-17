@@ -31,15 +31,15 @@ class OnboardingFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val section = arguments.getInt(ARG_SECTION_NUMBER)
-        val rootView = inflater?.inflate(R.layout.fragment_pager, container, false)
-        val textView = rootView?.findViewById(R.id.section_label) as TextView?
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val section = arguments!!.getInt(ARG_SECTION_NUMBER)
+        val rootView = inflater.inflate(R.layout.fragment_pager, container, false)
+        val textView = rootView?.findViewById<TextView>(R.id.section_label)
         val screenContent = content[section - 1]
         textView?.text = screenContent.title
-        val description = rootView?.findViewById(R.id.section_description) as TextView?
+        val description = rootView?.findViewById<TextView>(R.id.section_description)
         description?.text = screenContent.description
-        val imageView = rootView?.findViewById(R.id.section_img) as ImageView?
+        val imageView = rootView?.findViewById<ImageView>(R.id.section_img)
         imageView?.setBackgroundResource(screenContent.imageRes)
         return rootView
     }
