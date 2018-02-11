@@ -11,7 +11,7 @@ import com.k4kya.callback.R
 
 class OnboardingFragment : Fragment() {
 
-    val content: List<OnboardingPage>
+    private val content: List<OnboardingPage>
         get() {
             return listOf(
                     OnboardingPage(R.drawable.ic_vpn_key_white_36dp, "Create a trigger phrase", ""),

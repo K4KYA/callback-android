@@ -8,12 +8,15 @@ import android.support.v7.app.AppCompatActivity
 import android.widget.Button
 import android.widget.ImageView
 import com.k4kya.callback.R
+import com.k4kya.callback.util.bindView
+import com.k4kya.callback.util.bindViews
 import com.k4kya.kotlinrxbindings.views.PAGE_SCROLLED
 import com.k4kya.kotlinrxbindings.views.PAGE_SELECTED
 import com.k4kya.kotlinrxbindings.views.PageChangeEvent
 import com.k4kya.kotlinrxbindings.views.pageChanges
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 
 class OnboardingActivity : AppCompatActivity() {
     
@@ -23,31 +26,21 @@ class OnboardingActivity : AppCompatActivity() {
                 ContextCompat.getColor(this, R.color.colorAccent),
                 ContextCompat.getColor(this, R.color.action_red)
         )
-    
     private val evaluator = ArgbEvaluator()
-    
     private var currentPage = 0
-    
-    private val indicators: List<ImageView>
-        get() = listOf(
-                findViewById(R.id.intro_indicator_0),
-                findViewById(R.id.intro_indicator_1),
-                findViewById(R.id.intro_indicator_2)
-        )
-    
-    private val viewPager: ViewPager
-        get() = findViewById(R.id.viewPager)
-    
-    private val nextButton: Button
-        get() = findViewById(R.id.intro_btn_next)
-    
-    private val skipButton: Button
-        get() = findViewById(R.id.intro_btn_skip)
+    private val indicators: List<ImageView> by bindViews(
+            R.id.intro_indicator_0,
+            R.id.intro_indicator_1,
+            R.id.intro_indicator_2
+    )
+    private val viewPager: ViewPager by bindView(R.id.viewPager)
+    private val nextButton: Button by bindView(R.id.intro_btn_next)
+    private val skipButton: Button by bindView(R.id.intro_btn_skip)
+    private var viewPagerEvents: Subscription? = null
     
     private val sectionsPagerAdapter: OnboardingPagerAdapter
         get() = OnboardingPagerAdapter(supportFragmentManager)
     
-    private var viewPagerEvents: Subscription? = null
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,8 +88,9 @@ class OnboardingActivity : AppCompatActivity() {
     private fun setupViewPager() {
         viewPager.adapter = sectionsPagerAdapter
         viewPagerEvents = viewPager.pageChanges()
+                .observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread())
                 .filter { it.type == PAGE_SCROLLED || it.type == PAGE_SELECTED }
-                ?.subscribeOn(AndroidSchedulers.mainThread())
                 ?.subscribe {
                     when (it.type) {
                         PAGE_SCROLLED -> {

@@ -15,11 +15,11 @@ class OnboardingPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
     }
 
     override fun getPageTitle(position: Int): CharSequence? {
-        when (position) {
-            0 -> return "Section 1"
-            1 -> return "Section 2"
-            2 -> return "Section 3"
+        return when (position) {
+            0 -> "Section 1"
+            1 -> "Section 2"
+            2 -> "Section 3"
+            else -> null
         }
-        return null
     }
 }

@@ -3,7 +3,6 @@ package com.k4kya.callback.service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
 import android.provider.Telephony
 import android.telecom.TelecomManager
@@ -54,11 +53,13 @@ class SmsListener : BroadcastReceiver() {
                 isTriggerPhraseInMessage(it.message, triggerPhrase)
             }?.sender
 
-    private fun extractSmsMessagesFromIntent(intent: Intent) = intent.takeIf {
-        Telephony.Sms.Intents.SMS_RECEIVED_ACTION == it.action
-    }.let {
-        Telephony.Sms.Intents.getMessagesFromIntent(it).map {
-            Message(it.originatingAddress, it.messageBody)
+    private fun extractSmsMessagesFromIntent(intent: Intent): List<Message> {
+        return intent.takeIf {
+            Telephony.Sms.Intents.SMS_RECEIVED_ACTION == it.action
+        }.let {
+            Telephony.Sms.Intents.getMessagesFromIntent(it).map {
+                Message(it.originatingAddress, it.messageBody)
+            }
         }
     }
 
