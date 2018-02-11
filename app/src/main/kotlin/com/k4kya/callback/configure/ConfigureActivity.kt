@@ -27,10 +27,10 @@ import com.k4kya.kotlinrxbindings.widgets.textEvents
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 
-class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
-
-    private var presenter: ConfigureMvp.Presenter? = null
-
+class ConfigureActivity : AppCompatActivity(), ConfigureView {
+    
+    private var presenter: ConfigurePresenter? = null
+    
     private val requiredPermissions = listOf(
             Manifest.permission.CALL_PHONE,
             Manifest.permission.RECEIVE_SMS
@@ -47,7 +47,7 @@ class ConfigureActivity : AppCompatActivity(), ConfigureMvp.View {
         checkPermissions()
         setContentView(R.layout.activity_main)
         setSupportActionBar(actionbar)
-        presenter = ConfigurePresenter(PhoneCallbackService(this), this)
+        presenter = ConfigurePresenterImpl(PhoneCallbackService(this), this)
         setupUI()
     }
 

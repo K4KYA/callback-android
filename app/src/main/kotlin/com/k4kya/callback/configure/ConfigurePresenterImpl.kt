@@ -2,7 +2,7 @@ package com.k4kya.callback.configure
 
 import com.k4kya.callback.service.CallbackService
 
-class ConfigurePresenter(override var callbackService: CallbackService, override var view: ConfigureMvp.View) : ConfigureMvp.Presenter {
+class ConfigurePresenterImpl(override var callbackService: CallbackService, override var view: ConfigureView) : ConfigurePresenter {
 
     init {
         setupView()
