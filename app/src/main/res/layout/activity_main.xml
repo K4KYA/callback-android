@@ -62,5 +62,17 @@
             android:layout_height="wrap_content"
             android:padding="16dp"
             android:text="@string/start_on_speaker" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Make outgoing calls using:"/>
+        <android.support.v7.widget.AppCompatSpinner
+            android:id="@+id/spinner_calling_app"
+            android:layout_width="match_parent"
+            android:layout_height="52dp">
+
+        </android.support.v7.widget.AppCompatSpinner>
     </LinearLayout>
 </RelativeLayout>

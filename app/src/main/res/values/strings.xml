@@ -26,4 +26,5 @@
     <string name="next_button">Next</string>
     <string name="rate">Rate in Play Store</string>
     <string name="open_source">Open source licenses</string>
+    <string name="outgoing_call_app_label">Make outgoing calls using:</string>
 </resources>
