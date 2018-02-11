@@ -33,7 +33,7 @@ import rx.android.schedulers.AndroidSchedulers
 
 class ConfigureActivity : AppCompatActivity(), ConfigureView {
     
-    private var presenter: ConfigurePresenter? = null
+    private lateinit var presenter: ConfigurePresenter
     
     private val requiredPermissions = listOf(
             Manifest.permission.CALL_PHONE,
@@ -52,7 +52,7 @@ class ConfigureActivity : AppCompatActivity(), ConfigureView {
         checkPermissions()
         setContentView(R.layout.activity_main)
         setSupportActionBar(actionbar)
-        presenter = ConfigurePresenterImpl(PhoneCallbackService(this), this)
+        presenter = ConfigurePresenterImpl(PhoneCallbackService(applicationContext), this)
         setupUI()
     }
     
@@ -143,7 +143,7 @@ class ConfigureActivity : AppCompatActivity(), ConfigureView {
                     when (it) {
                         is AfterTextChangedEvent -> {
                             if (it.value != null) {
-                                presenter?.setTriggerPhrase(it.value.toString())
+                                presenter.setTriggerPhrase(it.value.toString())
                             }
                         }
                     }
@@ -152,19 +152,19 @@ class ConfigureActivity : AppCompatActivity(), ConfigureView {
     
     private fun setupUseSpeaker() {
         checkUseSpeaker.setOnCheckedChangeListener { _, checked ->
-            presenter?.setStartOnSpeaker(checked)
+            presenter.setStartOnSpeaker(checked)
         }
     }
     
     private fun setupTriggerPhraseUpdateButton() {
         btnSetTriggerPhrase.setOnClickListener {
-            presenter?.setTriggerPhrase(editTriggerPhrase.text.toString())
+            presenter.setTriggerPhrase(editTriggerPhrase.text.toString())
         }
     }
     
     private fun setupServiceToggleButton() {
         val btnToggle = btnToggle
-        btnToggle.setOnClickListener { presenter?.toggleCallbackEnabled() }
+        btnToggle.setOnClickListener { presenter.toggleCallbackEnabled() }
     }
     
     private fun getSharedPrefs(): SharedPreferences {
@@ -180,7 +180,7 @@ class ConfigureActivity : AppCompatActivity(), ConfigureView {
             val index = permissions.indexOf(it)
             val granted = grantResults[index]
             if (granted != PackageManager.PERMISSION_GRANTED) {
-                presenter?.setCallbackEnabled(false)
+                presenter.setCallbackEnabled(false)
             }
         }
     }

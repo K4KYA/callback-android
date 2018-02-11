@@ -10,9 +10,11 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnitRunner
 
+@RunWith(MockitoJUnitRunner::class)
 class ConfigurePresenterImplTest {
 
     @Mock lateinit var mockService : CallbackService
@@ -20,7 +22,6 @@ class ConfigurePresenterImplTest {
 
     @Before
     fun setup() {
-        MockitoAnnotations.initMocks(this)
         whenever(mockService.getServiceStatus()).thenReturn(false)
         whenever(mockService.getTriggerPhrase()).thenReturn("valid")
         whenever(mockView.getLatestTriggerPhrase()).thenReturn("valid")
@@ -58,7 +59,6 @@ class ConfigurePresenterImplTest {
 
     @Test
     fun cantSetInvalidTriggerPhrase() {
-        whenever(mockService.getStartOnSpeakerStatus()).thenReturn(false)
         val subject = ConfigurePresenterImpl(mockService, mockView)
         subject.setTriggerPhrase("bad")
         verify(mockService).setServiceEnabled(eq(false))

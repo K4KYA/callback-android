@@ -19,14 +19,14 @@ class SmsListener : BroadcastReceiver() {
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        if (!isCallbackServiceEnabled(context) || !isTelephonyEnabled(context)) {
+        if (!isCallbackServiceEnabled(context.applicationContext) || !isTelephonyEnabled(context)) {
             return
         }
         val triggerPhrase = getTriggerPhrase(context) ?: return
         val messages = extractSmsMessagesFromIntent(intent)
         val callbackNumber = callbackNumberFromMessagesForTrigger(messages, triggerPhrase)
         if (callbackNumber != null) {
-            startPhoneCallForNumber(callbackNumber, context)
+            startPhoneCallForNumber(callbackNumber, context.applicationContext)
         }
     }
 

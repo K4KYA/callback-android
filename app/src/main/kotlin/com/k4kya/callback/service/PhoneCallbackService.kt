@@ -1,22 +1,29 @@
 package com.k4kya.callback.service
 
 import android.content.Context
+import androidx.content.edit
 
 class PhoneCallbackService(private val context: Context) : CallbackService {
 
     override fun setServiceEnabled(enabled: Boolean) {
-        getSharedPrefs().edit().putBoolean(SmsListener.CALLBACK_SERVICE_ENABLED_FLAG, enabled).apply()
+        getSharedPrefs().edit{
+            putBoolean(SmsListener.CALLBACK_SERVICE_ENABLED_FLAG, enabled)
+        }
     }
 
     override fun setTriggerPhrase(trigger: String) {
-        getSharedPrefs().edit().putString(SmsListener.CALLBACK_SERVICE_TRIGGER_PHRASE, trigger).apply()
+        getSharedPrefs().edit{
+            putString(SmsListener.CALLBACK_SERVICE_TRIGGER_PHRASE, trigger)
+        }
     }
 
     override fun setSpeakerphoneEnabled(enabled: Boolean) {
-        getSharedPrefs().edit().putBoolean(SmsListener.CALLBACK_SERVICE_ENABLED_FLAG, enabled).apply()
+        getSharedPrefs().edit {
+            putBoolean(SmsListener.CALLBACK_USE_SPEAKERPHONE, enabled)
+        }
     }
 
-    override fun getTriggerPhrase() = getSharedPrefs().getString(SmsListener.CALLBACK_SERVICE_TRIGGER_PHRASE, "")
+    override fun getTriggerPhrase() = getSharedPrefs().getString(SmsListener.CALLBACK_SERVICE_TRIGGER_PHRASE, "")!!
 
     override fun getServiceStatus() = getSharedPrefs().getBoolean(SmsListener.CALLBACK_SERVICE_ENABLED_FLAG, false)
 
