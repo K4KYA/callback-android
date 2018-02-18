@@ -1,57 +1,38 @@
 package com.k4kya.callback.configure
 
-import com.k4kya.callback.service.CallbackService
+import com.k4kya.callback.interactor.ConfigureInteractor
 
-class ConfigurePresenterImpl(override var callbackService: CallbackService, override var view: ConfigureView) : ConfigurePresenter {
-
+class ConfigurePresenterImpl(private val configureInteractor: ConfigureInteractor, private val view: ConfigureView) : ConfigurePresenter {
+    
+    private var state = ConfigureViewModel(configureInteractor.getServiceStatus(), configureInteractor.getStartOnSpeakerStatus(), configureInteractor.getTriggerPhrase())
+        set(value) {
+            field = value
+            view.update(value)
+        }
+    
     init {
-        setupView()
+        view.update(state)
     }
-
-    private fun setupView() {
-        val enabled = callbackService.getServiceStatus()
-        view.updateStatusText(enabled)
-        view.setSpeakerEnabled(enabled)
-        val currentTrigger = callbackService.getTriggerPhrase()
-        view.setTriggerPhrase(currentTrigger)
-        view.setServiceToggleButtonEnabled(validateTriggerPhrase(currentTrigger))
-    }
-
-    override fun setCallbackEnabled(enabled: Boolean) {
-        val trigger = view.getLatestTriggerPhrase()
-        if (trigger == null || !validateTriggerPhrase(trigger)) {
-            callbackService.setServiceEnabled(false)
-            view.updateStatusText(false)
+    
+    override fun setCallbackEnabled(enabled: Boolean, triggerPhrase: String) {
+        state = if (!validateTriggerPhrase(triggerPhrase)) {
+            configureInteractor.setServiceEnabled(false)
+            view.showMessage("Trigger phrase must be at least 4 chars")
+            state.copy(toggleEnabled = false, triggerPhrase = triggerPhrase)
         } else {
-            setTriggerPhrase(trigger)
-            callbackService.setServiceEnabled(enabled)
-            view.updateStatusText(enabled)
+            configureInteractor.setServiceEnabled(enabled)
+            configureInteractor.setTriggerPhrase(triggerPhrase)
+            state.copy(toggleEnabled = enabled, triggerPhrase = triggerPhrase)
         }
     }
-
-    override fun setTriggerPhrase(triggerPhrase: String) {
-        if (validateTriggerPhrase(triggerPhrase)) {
-            callbackService.setTriggerPhrase(triggerPhrase)
-            view.setServiceToggleButtonEnabled(true)
-        } else {
-            setCallbackEnabled(false)
-            view.setServiceToggleButtonEnabled(false)
-        }
-    }
-
+    
     override fun setStartOnSpeaker(speaker: Boolean) {
-        callbackService.setSpeakerphoneEnabled(speaker)
+        configureInteractor.setSpeakerphoneEnabled(speaker)
+        state = state.copy(speakerEnabled = speaker)
     }
-
-    override fun toggleCallbackEnabled() {
-        setCallbackEnabled(!callbackService.getServiceStatus())
-    }
-
-    fun validateTriggerPhrase(phrase: String?) = when (phrase.isNullOrBlank()) {
-        true -> false
-        false -> phrase!!.length > TRIGGER_MIN_LENGTH
-    }
-
+    
+    internal fun validateTriggerPhrase(phrase: String) = phrase.length > TRIGGER_MIN_LENGTH
+    
     companion object {
         const val TRIGGER_MIN_LENGTH = 4
     }

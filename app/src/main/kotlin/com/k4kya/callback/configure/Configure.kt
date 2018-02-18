@@ -1,23 +1,18 @@
 package com.k4kya.callback.configure
 
-import com.k4kya.callback.service.CallbackService
-
 interface ConfigureView {
     fun showMessage(resId: Int)
     fun showMessage(message: String)
-    fun setCallbackStatusText(status: String)
-    fun setTriggerPhrase(trigger: CharSequence?)
-    fun setSpeakerEnabled(enabled: Boolean)
-    fun getLatestTriggerPhrase(): String?
-    fun updateStatusText(enabled: Boolean)
-    fun setServiceToggleButtonEnabled(enabled: Boolean)
+    fun update(viewModel: ConfigureViewModel)
 }
 
 interface ConfigurePresenter {
-    var view: ConfigureView
-    var callbackService: CallbackService
-    fun setCallbackEnabled(enabled: Boolean)
-    fun setTriggerPhrase(triggerPhrase: String)
+    fun setCallbackEnabled(enabled: Boolean, triggerPhrase: String)
     fun setStartOnSpeaker(speaker: Boolean)
-    fun toggleCallbackEnabled()
 }
+
+data class ConfigureViewModel(
+        val toggleEnabled: Boolean,
+        val speakerEnabled: Boolean,
+        val triggerPhrase: String
+)

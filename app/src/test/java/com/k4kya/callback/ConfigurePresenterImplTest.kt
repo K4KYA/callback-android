@@ -2,8 +2,10 @@ package com.k4kya.callback
 
 import com.k4kya.callback.configure.ConfigurePresenterImpl
 import com.k4kya.callback.configure.ConfigureView
-import com.k4kya.callback.service.CallbackService
+import com.k4kya.callback.configure.ConfigureViewModel
+import com.k4kya.callback.interactor.ConfigureInteractor
 import com.nhaarman.mockito_kotlin.eq
+import com.nhaarman.mockito_kotlin.reset
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import org.junit.Assert.assertFalse
@@ -16,52 +18,53 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 class ConfigurePresenterImplTest {
-
-    @Mock lateinit var mockService : CallbackService
-    @Mock lateinit var mockView : ConfigureView
-
-    @Before
-    fun setup() {
-        whenever(mockService.getServiceStatus()).thenReturn(false)
-        whenever(mockService.getTriggerPhrase()).thenReturn("valid")
-        whenever(mockView.getLatestTriggerPhrase()).thenReturn("valid")
+    
+    @Mock lateinit var interactor: ConfigureInteractor
+    @Mock lateinit var view: ConfigureView
+    private lateinit var presenter: ConfigurePresenterImpl
+    
+    @Before fun setup() {
+        whenever(interactor.getServiceStatus()).thenReturn(false)
+        whenever(interactor.getTriggerPhrase()).thenReturn("valid")
+        whenever(interactor.getStartOnSpeakerStatus()).thenReturn(false)
+        presenter = ConfigurePresenterImpl(interactor, view)
+        reset(view)
     }
-
-    @Test
-    fun testValidateTriggerPhrase() {
-        val subject = ConfigurePresenterImpl(mockService, mockView)
-        assertTrue(subject.validateTriggerPhrase("hello"))
-        assertFalse(subject.validateTriggerPhrase(""))
-        assertFalse(subject.validateTriggerPhrase("four"))
+    
+    @Test fun testValidateTriggerPhrase() {
+        assertTrue(presenter.validateTriggerPhrase("hello"))
+        assertFalse(presenter.validateTriggerPhrase(""))
+        assertFalse(presenter.validateTriggerPhrase("four"))
     }
-
-    @Test
-    fun testSetEnabledWithBadTrigger() {
-        whenever(mockView.getLatestTriggerPhrase()).thenReturn("bad")
-        val subject = ConfigurePresenterImpl(mockService, mockView)
-        subject.setCallbackEnabled(true)
-        assertFalse(mockService.getServiceStatus())
+    
+    @Test fun testSetEnabledWithGoodTrigger() {
+        presenter.setCallbackEnabled(true, "valid")
+        verify(interactor).setServiceEnabled(eq(true))
+        verify(interactor).setTriggerPhrase("valid")
+        verify(view).update(eq(
+                ConfigureViewModel(
+                        true,
+                        false,
+                        "valid"
+                )
+        ))
     }
-
-    @Test
-    fun testSetEnabledWithGoodTrigger() {
-        val subject = ConfigurePresenterImpl(mockService, mockView)
-        subject.setCallbackEnabled(true)
-        verify(mockService).setServiceEnabled(eq(true))
+    
+    @Test fun testStartOnSpeaker() {
+        presenter.setStartOnSpeaker(true)
+        verify(interactor).setSpeakerphoneEnabled(eq(true))
     }
-
-    @Test
-    fun testStartOnSpeaker() {
-        val subject = ConfigurePresenterImpl(mockService, mockView)
-        subject.setStartOnSpeaker(true)
-        verify(mockService).setSpeakerphoneEnabled(eq(true))
+    
+    @Test fun cantSetInvalidTriggerPhrase() {
+        presenter.setCallbackEnabled(true, "bad")
+        verify(interactor).setServiceEnabled(eq(false))
+        verify(view).update(eq(
+                ConfigureViewModel(
+                        false,
+                        false,
+                        "bad"
+                )
+        ))
     }
-
-    @Test
-    fun cantSetInvalidTriggerPhrase() {
-        val subject = ConfigurePresenterImpl(mockService, mockView)
-        subject.setTriggerPhrase("bad")
-        verify(mockService).setServiceEnabled(eq(false))
-    }
-
+    
 }

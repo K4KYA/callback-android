@@ -5,13 +5,17 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 
 class OnboardingPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+    
+    private val pages = listOf(
+            OnboardingFragment.createInstance(0),
+            OnboardingFragment.createInstance(1),
+            OnboardingFragment.createInstance(2)
+    )
 
-    override fun getCount(): Int {
-        return 3
-    }
+    override fun getCount() = pages.size
 
     override fun getItem(position: Int): Fragment? {
-        return OnboardingFragment.createInstance(position + 1)
+        return pages[position]
     }
 
     override fun getPageTitle(position: Int): CharSequence? {

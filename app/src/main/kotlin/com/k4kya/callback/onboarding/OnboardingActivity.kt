@@ -16,7 +16,6 @@ import com.k4kya.kotlinrxbindings.views.PageChangeEvent
 import com.k4kya.kotlinrxbindings.views.pageChanges
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
 
 class OnboardingActivity : AppCompatActivity() {
     
@@ -36,10 +35,7 @@ class OnboardingActivity : AppCompatActivity() {
     private val viewPager: ViewPager by bindView(R.id.viewPager)
     private val nextButton: Button by bindView(R.id.intro_btn_next)
     private val skipButton: Button by bindView(R.id.intro_btn_skip)
-    private var viewPagerEvents: Subscription? = null
-    
-    private val sectionsPagerAdapter: OnboardingPagerAdapter
-        get() = OnboardingPagerAdapter(supportFragmentManager)
+    private lateinit var viewPagerEvents: Subscription
     
     
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,7 +51,9 @@ class OnboardingActivity : AppCompatActivity() {
     
     override fun onPause() {
         super.onPause()
-        viewPagerEvents?.unsubscribe()
+        if (::viewPagerEvents.isInitialized) {
+            viewPagerEvents.unsubscribe()
+        }
     }
     
     override fun onBackPressed() {
@@ -86,12 +84,12 @@ class OnboardingActivity : AppCompatActivity() {
     }
     
     private fun setupViewPager() {
-        viewPager.adapter = sectionsPagerAdapter
+        viewPager.adapter = OnboardingPagerAdapter(supportFragmentManager)
         viewPagerEvents = viewPager.pageChanges()
-                .observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread())
                 .filter { it.type == PAGE_SCROLLED || it.type == PAGE_SELECTED }
-                ?.subscribe {
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe({
                     when (it.type) {
                         PAGE_SCROLLED -> {
                             pageScrolled(it)
@@ -100,7 +98,9 @@ class OnboardingActivity : AppCompatActivity() {
                             pageSelected(it)
                         }
                     }
-                }
+                }, {
+                    it.printStackTrace()
+                })
     }
     
     private fun pageSelected(event: PageChangeEvent) {

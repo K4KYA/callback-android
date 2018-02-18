@@ -9,11 +9,11 @@ import com.k4kya.callback.R
 import com.k4kya.callback.util.bindView
 
 class WebViewActivity : AppCompatActivity() {
-
-    val webView: WebView by bindView(R.id.web_view)
-
-    val toolbar: Toolbar by bindView(R.id.toolbar)
-
+    
+    private val webView: WebView by bindView(R.id.web_view)
+    
+    private val toolbar: Toolbar by bindView(R.id.toolbar)
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.webview_activity)
@@ -25,7 +25,7 @@ class WebViewActivity : AppCompatActivity() {
         }
         setupToolbar(target)
     }
-
+    
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
@@ -34,12 +34,12 @@ class WebViewActivity : AppCompatActivity() {
             else -> false
         }
     }
-
+    
     private fun setupToolbar(target: String) {
         setSupportActionBar(toolbar)
         supportActionBar?.title = target
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
-
+    
 }
